@@ -1,0 +1,4904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CFA Mock Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F1E33;
+    --ink-2:#152847;
+    --paper:#F6F4EC;
+    --paper-2:#EFEBDF;
+    --gold:#B7893D;
+    --gold-light:#D9B876;
+    --green:#2F6844;
+    --green-bg:#E4EFE7;
+    --red:#A13D2B;
+    --red-bg:#F4E4E0;
+    --slate:#33404F;
+    --slate-soft:#6B7686;
+    --off-white:#EDEEEF;
+    --line: rgba(15,30,51,0.14);
+    --radius: 3px;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --sans: 'IBM Plex Sans', -apple-system, sans-serif;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: var(--sans);
+    background: var(--paper);
+    color: var(--slate);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+
+  /* ---------- layout ---------- */
+  .app{
+    display:grid;
+    grid-template-columns: 300px 1fr;
+    min-height:100vh;
+  }
+  @media (max-width: 860px){
+    .app{ grid-template-columns: 1fr; }
+    .sidebar{ position:relative; }
+  }
+
+  /* ---------- sidebar ---------- */
+  .sidebar{
+    background: var(--ink);
+    color: var(--off-white);
+    padding: 28px 22px 24px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .ticket{
+    border:1px solid rgba(255,255,255,0.16);
+    border-radius: var(--radius);
+    padding:16px 16px 14px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+    position:relative;
+    overflow:hidden;
+  }
+  .ticket::after{
+    content:"";
+    position:absolute;
+    right:-18px; top:-18px;
+    width:70px; height:70px;
+    border-radius:50%;
+    border:1.5px dashed rgba(183,137,61,0.55);
+  }
+  .ticket-eyebrow{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.14em;
+    color: var(--gold-light);
+    text-transform:uppercase;
+  }
+  .ticket h1{
+    font-family: var(--serif);
+    font-weight:600;
+    font-size:26px;
+    line-height:1.15;
+    margin:6px 0 10px;
+    color:#fff;
+  }
+  .ticket-meta{
+    font-family:var(--mono);
+    font-size:11px;
+    color: rgba(255,255,255,0.62);
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+  .ticket-meta b{ color: rgba(255,255,255,0.88); font-weight:500; }
+
+  .readiness{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px solid rgba(255,255,255,0.14);
+  }
+  .readiness .num{
+    font-family:var(--mono);
+    font-size:34px;
+    font-weight:600;
+    color: var(--gold-light);
+  }
+  .readiness .lbl{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color: rgba(255,255,255,0.55);
+  }
+
+  .nav-title{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: rgba(255,255,255,0.45);
+    margin: 4px 2px -6px;
+  }
+  .topic-list{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .topic-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:9px 10px;
+    border-radius: var(--radius);
+    cursor:pointer;
+    border:1px solid transparent;
+    background:transparent;
+    color:inherit;
+    font-family:var(--sans);
+    text-align:left;
+    width:100%;
+  }
+  .topic-row:hover{ background: rgba(255,255,255,0.06); }
+  .topic-row .t-name{
+    font-size:12.5px;
+    font-weight:500;
+    color: rgba(255,255,255,0.92);
+  }
+  .topic-row .t-weight{
+    font-family:var(--mono);
+    font-size:10px;
+    color: rgba(255,255,255,0.4);
+  }
+  .topic-row .t-right{
+    display:flex; align-items:center; gap:8px;
+  }
+  .t-score{
+    font-family:var(--mono);
+    font-size:11px;
+    min-width:30px;
+    text-align:right;
+  }
+  .t-score.empty{ color: rgba(255,255,255,0.32); }
+  .t-bar-track{
+    width:36px; height:4px; border-radius:2px;
+    background: rgba(255,255,255,0.14);
+    overflow:hidden;
+  }
+  .t-bar-fill{ height:100%; background: var(--gold-light); }
+
+  .btn{
+    font-family: var(--sans);
+    font-weight:600;
+    font-size:13px;
+    border:none;
+    border-radius: var(--radius);
+    padding:12px 16px;
+    cursor:pointer;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    letter-spacing:.01em;
+  }
+  .btn:active{ transform: translateY(1px); }
+  .btn-gold{
+    background: var(--gold);
+    color:#1a1206;
+  }
+  .btn-gold:hover{ background: var(--gold-light); }
+  .btn-ghost{
+    background: transparent;
+    border:1px solid var(--line);
+    color: var(--slate);
+  }
+  .btn-ghost:hover{ background: var(--paper-2); }
+  .btn-ghost-dark{
+    background: transparent;
+    border:1px solid rgba(255,255,255,0.22);
+    color: rgba(255,255,255,0.85);
+  }
+  .btn-ghost-dark:hover{ background: rgba(255,255,255,0.06); }
+  .btn-block{ width:100%; }
+
+  .sidebar-footer{
+    margin-top:auto;
+    font-family:var(--mono);
+    font-size:10px;
+    color: rgba(255,255,255,0.34);
+    line-height:1.6;
+  }
+
+  /* ---------- main ---------- */
+  .main{
+    padding: 34px 40px 60px;
+    max-width: 980px;
+    width:100%;
+  }
+  @media (max-width: 640px){
+    .main{ padding: 22px 16px 50px; }
+  }
+  .top-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom: 28px;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: var(--gold);
+    margin-bottom:6px;
+  }
+  .page-title{
+    font-family: var(--serif);
+    font-size:32px;
+    font-weight:600;
+    color: var(--ink);
+    margin:0;
+  }
+  .page-sub{
+    color: var(--slate-soft);
+    font-size:14px;
+    margin-top:6px;
+    max-width:520px;
+    line-height:1.5;
+  }
+
+  /* dashboard grid */
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap:14px;
+    margin-top: 6px;
+  }
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding:18px 18px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    transition: box-shadow .15s ease, transform .15s ease;
+  }
+  .card:hover{ box-shadow: 0 6px 18px rgba(15,30,51,0.08); transform: translateY(-1px); }
+  .card-top{
+    display:flex; justify-content:space-between; align-items:flex-start;
+  }
+  .card-num{
+    font-family:var(--mono);
+    font-size:10px;
+    color: var(--slate-soft);
+  }
+  .card h3{
+    font-family: var(--serif);
+    font-size:17px;
+    font-weight:600;
+    margin:0;
+    color: var(--ink);
+    line-height:1.3;
+  }
+  .card .weight-pill{
+    font-family:var(--mono);
+    font-size:10px;
+    color: var(--gold);
+    border:1px solid rgba(183,137,61,0.4);
+    border-radius:20px;
+    padding:2px 8px;
+    white-space:nowrap;
+  }
+  .card-bar-track{
+    height:5px; border-radius:3px; background: var(--paper-2); overflow:hidden;
+  }
+  .card-bar-fill{ height:100%; background: var(--green); border-radius:3px; }
+  .card-bar-fill.mid{ background: var(--gold); }
+  .card-bar-fill.low{ background: var(--red); }
+  .card-meta{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--mono);
+    font-size:11px;
+    color: var(--slate-soft);
+  }
+  .card-cta{
+    margin-top:4px;
+    font-family:var(--sans);
+    font-size:12.5px;
+    font-weight:600;
+    color: var(--ink);
+    background: var(--paper-2);
+    border:none;
+    border-radius: var(--radius);
+    padding:9px 12px;
+    cursor:pointer;
+    text-align:left;
+  }
+  .card-cta:hover{ background:#e4dfd0; }
+
+  /* session ledger */
+  .ledger{
+    margin-top:38px;
+  }
+  .section-label{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color: var(--slate-soft);
+    margin-bottom:10px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-label::after{
+    content:""; flex:1; height:1px; background: var(--line);
+  }
+  .section-label-row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:14px; margin-bottom:10px; flex-wrap:wrap;
+    border-bottom:1px solid var(--line);
+    padding-bottom:10px;
+  }
+  .section-label-text{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color: var(--slate-soft);
+  }
+  .btn-small-mono{
+    font-family:var(--mono);
+    font-size:10.5px;
+    padding:7px 11px;
+    white-space:nowrap;
+  }
+  .ledger-table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    border:1px solid var(--line);
+  }
+  .ledger-table th{
+    text-align:left;
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color: var(--slate-soft);
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+    background: var(--paper-2);
+  }
+  .ledger-table td{
+    padding:10px 14px;
+    font-size:13px;
+    border-bottom:1px solid var(--line);
+  }
+  .ledger-table tr:last-child td{ border-bottom:none; }
+  .ledger-empty{
+    padding:26px 14px;
+    text-align:center;
+    color: var(--slate-soft);
+    font-size:13px;
+    background:#fff;
+    border:1px dashed var(--line);
+  }
+  .score-tag{
+    font-family:var(--mono);
+    font-weight:600;
+    padding:2px 8px;
+    border-radius:20px;
+    font-size:11.5px;
+    display:inline-block;
+  }
+  .score-tag.good{ background: var(--green-bg); color: var(--green); }
+  .score-tag.mid{ background:#F6EFE0; color:#8A6412; }
+  .score-tag.bad{ background: var(--red-bg); color: var(--red); }
+
+  /* ---------- quiz ---------- */
+  .quiz-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px; gap:14px; flex-wrap:wrap;
+  }
+  .quiz-topic-tag{
+    font-family:var(--mono);
+    font-size:11px;
+    color: var(--gold);
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+  .quiz-count{
+    font-family:var(--mono);
+    font-size:12px;
+    color: var(--slate-soft);
+  }
+  .dots{
+    display:flex; gap:6px; flex-wrap:wrap; margin-bottom:26px;
+  }
+  .dot{
+    width:9px; height:9px; border-radius:50%;
+    background: var(--paper-2);
+    border:1px solid var(--line);
+  }
+  .dot.answered-correct{ background: var(--green); border-color: var(--green); }
+  .dot.answered-wrong{ background: var(--red); border-color: var(--red); }
+  .dot.current{ box-shadow: 0 0 0 3px rgba(183,137,61,0.28); border-color: var(--gold); }
+
+  .exam-paper{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 32px 34px 28px;
+    position:relative;
+    box-shadow: 0 1px 0 var(--line), 0 10px 26px rgba(15,30,51,0.05);
+  }
+  @media (max-width: 640px){
+    .exam-paper{ padding:24px 18px 22px; }
+  }
+  .exam-paper::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0;
+    width:4px;
+    background: var(--gold);
+    border-radius: var(--radius) 0 0 var(--radius);
+  }
+  .q-number{
+    font-family:var(--mono);
+    font-size:12px;
+    color: var(--slate-soft);
+    margin-bottom:10px;
+  }
+  .q-text{
+    font-family: var(--serif);
+    font-size:20px;
+    line-height:1.45;
+    color: var(--ink);
+    margin:0 0 24px;
+  }
+  .options{
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .option{
+    display:flex; align-items:center; gap:14px;
+    padding:13px 16px;
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper);
+    cursor:pointer;
+    text-align:left;
+    font-family: var(--sans);
+    font-size:14.5px;
+    color: var(--slate);
+    transition: border-color .12s ease, background .12s ease;
+  }
+  .option:hover:not(.locked){ border-color: var(--gold); background:#fff; }
+  .bubble{
+    flex:0 0 auto;
+    width:28px; height:28px; border-radius:50%;
+    border:1.5px solid var(--slate-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono);
+    font-size:12.5px;
+    font-weight:600;
+    color: var(--slate-soft);
+    background:#fff;
+    transition: all .15s ease;
+  }
+  .option.selected .bubble{
+    border-color: var(--gold);
+    background: var(--gold);
+    color:#fff;
+  }
+  .option.correct-reveal{
+    border-color: var(--green);
+    background: var(--green-bg);
+  }
+  .option.correct-reveal .bubble{
+    border-color: var(--green);
+    background: var(--green);
+    color:#fff;
+  }
+  .option.wrong-reveal{
+    border-color: var(--red);
+    background: var(--red-bg);
+  }
+  .option.wrong-reveal .bubble{
+    border-color: var(--red);
+    background: var(--red);
+    color:#fff;
+  }
+  .option.locked{ cursor:default; }
+  .option .mark{
+    margin-left:auto;
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:15px;
+  }
+  .option.correct-reveal .mark{ color: var(--green); }
+  .option.wrong-reveal .mark{ color: var(--red); }
+
+  .verdict-row{
+    display:flex; align-items:center; gap:14px;
+    margin-top:22px;
+  }
+  .stamp{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:7px 14px;
+    border-radius:2px;
+    border:2px solid currentColor;
+    display:inline-block;
+    transform: rotate(-4deg) scale(0);
+    animation: stamp-in .25s ease-out forwards;
+  }
+  .stamp.correct{ color: var(--green); }
+  .stamp.wrong{ color: var(--red); }
+  @keyframes stamp-in{
+    0%{ transform: rotate(-4deg) scale(0); opacity:0; }
+    60%{ transform: rotate(-4deg) scale(1.12); opacity:1; }
+    100%{ transform: rotate(-4deg) scale(1); opacity:1; }
+  }
+
+  .explain-box{
+    margin-top:16px;
+    border:1px dashed var(--line);
+    border-radius: var(--radius);
+    padding:14px 16px;
+    background: var(--paper);
+    animation: slide-down .2s ease-out;
+  }
+  @keyframes slide-down{
+    from{ opacity:0; transform: translateY(-6px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  .explain-label{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color: var(--slate-soft);
+    margin-bottom:6px;
+  }
+  .explain-text{
+    font-size:13.5px;
+    line-height:1.55;
+    color: var(--slate);
+  }
+
+  .quiz-footer{
+    display:flex; justify-content:flex-end; margin-top:22px;
+  }
+
+  /* results */
+  .results-summary{
+    display:flex; align-items:center; gap:28px;
+    background: var(--ink);
+    color:#fff;
+    border-radius: var(--radius);
+    padding:28px 30px;
+    margin-bottom:26px;
+    flex-wrap:wrap;
+  }
+  .results-score{
+    font-family:var(--mono);
+    font-size:52px;
+    font-weight:600;
+    color: var(--gold-light);
+    line-height:1;
+  }
+  .results-score-lbl{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-top:6px;
+  }
+  .results-msg{
+    font-family: var(--serif);
+    font-size:18px;
+    max-width:360px;
+    line-height:1.4;
+  }
+  .review-list{ display:flex; flex-direction:column; gap:8px; }
+  .review-item{
+    display:flex; align-items:flex-start; gap:12px;
+    padding:12px 14px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .review-icon{
+    flex:0 0 auto;
+    width:20px; height:20px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:11px; font-weight:700; color:#fff;
+    margin-top:2px;
+  }
+  .review-icon.ok{ background: var(--green); }
+  .review-icon.no{ background: var(--red); }
+  .review-body{ font-size:13.5px; line-height:1.5; }
+  .review-body .rq{ color: var(--ink); font-weight:600; margin-bottom:3px;}
+  .review-body .ra{ color: var(--slate-soft); font-size:12.5px; }
+
+  .results-actions{
+    display:flex; gap:10px; margin-top:24px; flex-wrap:wrap;
+  }
+
+  .count-options{
+    display:flex; gap:10px; flex-wrap:wrap; margin-top:22px;
+  }
+  .count-pill{
+    font-family:var(--mono);
+    font-size:14px;
+    font-weight:600;
+    padding:14px 22px;
+    border:1.5px solid var(--line);
+    border-radius: var(--radius);
+    background:#fff;
+    cursor:pointer;
+    color: var(--slate);
+    text-align:center;
+    min-width:90px;
+  }
+  .count-pill:hover{ border-color: var(--gold); }
+  .count-pill.selected{
+    border-color: var(--gold);
+    background: var(--gold);
+    color:#fff;
+  }
+  .count-pill .cp-sub{
+    display:block;
+    font-family:var(--sans);
+    font-size:10px;
+    font-weight:400;
+    margin-top:3px;
+    opacity:0.75;
+  }
+  .hidden{ display:none !important; }
+  .loading-line{
+    font-family:var(--mono);
+    font-size:12px;
+    color: var(--slate-soft);
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="ticket">
+      <div class="ticket-eyebrow">Admission Ticket</div>
+      <h1>CFA Mock Desk</h1>
+      <div class="ticket-meta">
+        <div>Candidate&nbsp; <b id="candidateId">—</b></div>
+        <div>Level&nbsp;I &middot; Curriculum 2026</div>
+      </div>
+      <div class="readiness">
+        <div class="num" id="readinessNum">—</div>
+        <div class="lbl">readiness<br/>score</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="nav-title">Topic Areas</div>
+      <div class="topic-list" id="topicList"></div>
+    </div>
+
+    <button class="btn btn-gold btn-block" id="startFullMock">Start Full Mock Exam →</button>
+    <button class="btn btn-ghost-dark btn-block" id="backBtn" style="margin-top:-10px;">← Back to dashboard</button>
+
+    <div class="sidebar-footer">
+      Vibe-coded study desk.<br/>
+      300-question bank &middot; random draw every session.<br/>
+      <span id="storageBadge">Checking storage…</span>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- DASHBOARD VIEW -->
+    <section id="view-dashboard">
+      <div class="top-row">
+        <div>
+          <div class="eyebrow">Study Dashboard</div>
+          <h1 class="page-title">Where you actually stand</h1>
+          <p class="page-sub">Ten topic areas, weighted the way the real exam weights them. Pick one to drill, or sit a full mixed mock below.</p>
+        </div>
+      </div>
+
+      <div class="grid" id="topicGrid"></div>
+
+      <div class="ledger">
+        <div class="section-label-row">
+          <div class="section-label-text">Session Ledger</div>
+          <button class="btn btn-ghost btn-small-mono" id="downloadHistoryBtn">⬇ Download Full History (CSV)</button>
+        </div>
+        <div id="ledgerWrap"></div>
+      </div>
+    </section>
+
+    <!-- SETUP VIEW -->
+    <section id="view-setup" class="hidden">
+      <div class="eyebrow">Before You Begin</div>
+      <h1 class="page-title" id="setupTitle">Set up your mock</h1>
+      <p class="page-sub" id="setupSub">Choose how many questions to pull, at random, from the question bank.</p>
+
+      <div class="count-options" id="countOptions"></div>
+
+      <div style="display:flex; gap:10px; margin-top:24px;">
+        <button class="btn btn-gold" id="beginMockBtn">Begin Mock →</button>
+        <button class="btn btn-ghost" id="setupBackBtn">Cancel</button>
+      </div>
+    </section>
+
+    <!-- QUIZ VIEW -->
+    <section id="view-quiz" class="hidden">
+      <div class="quiz-head">
+        <div>
+          <div class="quiz-topic-tag" id="quizTopicTag">Topic</div>
+          <div class="quiz-count" id="quizCount">Question 1 of 10</div>
+        </div>
+      </div>
+      <div class="dots" id="quizDots"></div>
+
+      <div class="exam-paper">
+        <div class="q-number" id="qNumber">Q 01</div>
+        <p class="q-text" id="qText">Question text</p>
+        <div class="options" id="qOptions"></div>
+
+        <div id="verdictArea"></div>
+      </div>
+
+      <div class="quiz-footer">
+        <button class="btn btn-gold hidden" id="nextBtn">Next Question →</button>
+      </div>
+    </section>
+
+    <!-- RESULTS VIEW -->
+    <section id="view-results" class="hidden">
+      <div class="eyebrow">Session Graded</div>
+      <h1 class="page-title" style="margin-bottom:20px;">Results</h1>
+
+      <div class="results-summary">
+        <div>
+          <div class="results-score" id="resultsScore">0/0</div>
+          <div class="results-score-lbl">correct</div>
+        </div>
+        <div class="results-msg" id="resultsMsg">—</div>
+      </div>
+
+      <div class="section-label">Review</div>
+      <div class="review-list" id="reviewList"></div>
+
+      <div class="results-actions">
+        <button class="btn btn-gold" id="resultsBackBtn">Back to Dashboard</button>
+        <button class="btn btn-ghost" id="resultsRetakeBtn">Retake This Set</button>
+        <button class="btn btn-ghost" id="downloadSetBtn">⬇ Download This Set (CSV)</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+
+  /* =========================================================
+     QUESTION BANK
+  ========================================================= */
+  const TOPICS = [
+    { id:'ethics',    name:'Ethical & Professional Standards', weight:17 },
+    { id:'quant',     name:'Quantitative Methods',              weight:8  },
+    { id:'econ',      name:'Economics',                         weight:8  },
+    { id:'fra',       name:'Financial Statement Analysis',      weight:12 },
+    { id:'corp',      name:'Corporate Issuers',                 weight:8  },
+    { id:'equity',    name:'Equity Investments',                weight:12 },
+    { id:'fixed',     name:'Fixed Income',                      weight:12 },
+    { id:'deriv',     name:'Derivatives',                       weight:6  },
+    { id:'alt',       name:'Alternative Investments',           weight:8  },
+    { id:'pm',        name:'Portfolio Management',              weight:9  },
+  ];
+
+  const QUESTIONS = [
+  {
+    "id": "q0",
+    "topic": "ethics",
+    "q": "A member learns a colleague violated securities law. The member's first obligation under Standard I(A) is to:",
+    "options": [
+      "Report it to CFA Institute immediately",
+      "Dissociate from the activity and consider escalating internally",
+      "Ignore it unless asked directly"
+    ],
+    "correct": 1,
+    "explain": "Standard I(A) requires disassociation from known violations; CFA Institute is not the mandated reporting channel."
+  },
+  {
+    "id": "q1",
+    "topic": "ethics",
+    "q": "A CFA charterholder who has not kept up with securities regulation in a new market she now covers is most likely violating:",
+    "options": [
+      "Standard I(A) Knowledge of the Law",
+      "Standard III(A) Loyalty, Prudence, and Care",
+      "Standard V(B) Communication with Clients"
+    ],
+    "correct": 0,
+    "explain": "Standard I(A) requires members to understand and comply with applicable laws and regulations of the markets they operate in."
+  },
+  {
+    "id": "q2",
+    "topic": "ethics",
+    "q": "An analyst allows a large client's threats of withdrawing business to influence a research rating. This breaches:",
+    "options": [
+      "Standard IV(A) Loyalty to Employer",
+      "Standard I(B) Independence and Objectivity",
+      "Standard VII(A) Conduct as Member"
+    ],
+    "correct": 1,
+    "explain": "Standard I(B) requires members to maintain independence and objectivity, free from outside pressure that could compromise judgment."
+  },
+  {
+    "id": "q3",
+    "topic": "ethics",
+    "q": "A member copies paragraphs from a sell-side report into her own research without attribution. This most likely violates:",
+    "options": [
+      "Standard I(C) Misrepresentation",
+      "Standard II(A) Material Nonpublic Information",
+      "Standard VI(B) Priority of Transactions"
+    ],
+    "correct": 0,
+    "explain": "Presenting others' work as one's own is plagiarism, a violation of Standard I(C) Misrepresentation."
+  },
+  {
+    "id": "q4",
+    "topic": "ethics",
+    "q": "A portfolio manager overhears nonpublic merger details at a private dinner and trades on them. This violates:",
+    "options": [
+      "Standard III(C) Suitability",
+      "Standard II(A) Material Nonpublic Information",
+      "Standard IV(B) Additional Compensation"
+    ],
+    "correct": 1,
+    "explain": "Standard II(A) prohibits trading or causing others to trade on material nonpublic information."
+  },
+  {
+    "id": "q5",
+    "topic": "ethics",
+    "q": "A trader enters a series of wash trades to create the appearance of market activity. This is a violation of:",
+    "options": [
+      "Standard II(B) Market Manipulation",
+      "Standard I(D) Misconduct",
+      "Standard V(A) Diligence and Reasonable Basis"
+    ],
+    "correct": 0,
+    "explain": "Standard II(B) prohibits transactions that distort prices or artificially inflate trading volume."
+  },
+  {
+    "id": "q6",
+    "topic": "ethics",
+    "q": "Under Standard III(A) Loyalty, Prudence, and Care, a manager's duty of loyalty is owed primarily to:",
+    "options": [
+      "The manager's employer",
+      "The client",
+      "The broader investment industry"
+    ],
+    "correct": 1,
+    "explain": "Standard III(A) requires members to act for the benefit of clients and place client interests above their own or their firm's."
+  },
+  {
+    "id": "q7",
+    "topic": "ethics",
+    "q": "A broker allocates the best-performing trade of the day to her personal account and the rest pro-rata to clients. This breaches:",
+    "options": [
+      "Standard III(B) Fair Dealing",
+      "Standard VI(C) Referral Fees",
+      "Standard I(A) Knowledge of the Law"
+    ],
+    "correct": 0,
+    "explain": "Standard III(B) requires members to treat all clients fairly when disseminating recommendations or taking investment action."
+  },
+  {
+    "id": "q8",
+    "topic": "ethics",
+    "q": "Before recommending a concentrated equity position, an advisor should primarily evaluate it against:",
+    "options": [
+      "The firm's model portfolio",
+      "The client's investment policy statement and risk profile",
+      "The prior quarter's best-performing sector"
+    ],
+    "correct": 1,
+    "explain": "Standard III(C) Suitability requires recommendations to be consistent with the client's objectives, constraints, and risk tolerance."
+  },
+  {
+    "id": "q9",
+    "topic": "ethics",
+    "q": "A firm advertises five-year returns but omits a year in which the strategy lost 40%. This most likely violates:",
+    "options": [
+      "Standard III(D) Performance Presentation",
+      "Standard V(C) Record Retention",
+      "Standard IV(C) Responsibilities of Supervisors"
+    ],
+    "correct": 0,
+    "explain": "Standard III(D) requires performance presentations to be fair, accurate, and complete, not selectively favorable."
+  },
+  {
+    "id": "q10",
+    "topic": "ethics",
+    "q": "A wealth manager discusses a client's specific holdings with a friend at a party. This breaches:",
+    "options": [
+      "Standard III(E) Preservation of Confidentiality",
+      "Standard I(B) Independence and Objectivity",
+      "Standard II(B) Market Manipulation"
+    ],
+    "correct": 0,
+    "explain": "Standard III(E) requires members to keep client information confidential unless disclosure is required by law or authorized by the client."
+  },
+  {
+    "id": "q11",
+    "topic": "ethics",
+    "q": "An employee moonlights for a competing advisory firm on weekends without informing her employer. This most likely violates:",
+    "options": [
+      "Standard IV(A) Loyalty",
+      "Standard V(B) Communication with Clients",
+      "Standard VI(A) Disclosure of Conflicts"
+    ],
+    "correct": 0,
+    "explain": "Standard IV(A) requires members to act for the benefit of their employer and not undertake independent competing activishy without consent."
+  },
+  {
+    "id": "q12",
+    "topic": "ethics",
+    "q": "A member accepts a paid board seat at a client company without telling her employer. This is most likely a violation of:",
+    "options": [
+      "Standard IV(B) Additional Compensation Arrangements",
+      "Standard I(C) Misrepresentation",
+      "Standard V(A) Diligence and Reasonable Basis"
+    ],
+    "correct": 0,
+    "explain": "Standard IV(B) requires written consent from the employer before accepting compensation or benefits that could create a conflict."
+  },
+  {
+    "id": "q13",
+    "topic": "ethics",
+    "q": "A research director who fails to enforce her firm's compliance procedures, allowing repeated violations, most likely breaches:",
+    "options": [
+      "Standard IV(C) Responsibilities of Supervisors",
+      "Standard VII(B) Reference to CFA Institute",
+      "Standard II(A) Material Nonpublic Information"
+    ],
+    "correct": 0,
+    "explain": "Standard IV(C) holds supervisors responsible for making reasonable efforts to detect and prevent violations by those they supervise."
+  },
+  {
+    "id": "q14",
+    "topic": "ethics",
+    "q": "An analyst issues a 'buy' recommendation based solely on a company's press release, without independent verification. This violates:",
+    "options": [
+      "Standard V(A) Diligence and Reasonable Basis",
+      "Standard III(B) Fair Dealing",
+      "Standard I(D) Misconduct"
+    ],
+    "correct": 0,
+    "explain": "Standard V(A) requires members to have a reasonable and adequate basis, supported by research, for any recommendation."
+  },
+  {
+    "id": "q15",
+    "topic": "ethics",
+    "q": "Under Standard V(B), when using a complex quantitative model in client reports, a member should:",
+    "options": [
+      "Withhold model details as proprietary",
+      "Disclose the model's basic nature and limitations",
+      "Only disclose the model if the client asks"
+    ],
+    "correct": 1,
+    "explain": "Standard V(B) requires clear disclosure of the basic format and limitations of any investment process used, including models."
+  },
+  {
+    "id": "q16",
+    "topic": "ethics",
+    "q": "A firm's policy of retaining research files for only six months after an analyst departs most likely conflicts with:",
+    "options": [
+      "Standard V(C) Record Retention",
+      "Standard VI(C) Referral Fees",
+      "Standard III(D) Performance Presentation"
+    ],
+    "correct": 0,
+    "explain": "Standard V(C) requires members to maintain records supporting their analysis for a reasonable period, generally at least seven years absent stricter local rules."
+  },
+  {
+    "id": "q17",
+    "topic": "ethics",
+    "q": "A member fails to disclose to her employer that her spouse holds a large stake in a company she covers. This breaches:",
+    "options": [
+      "Standard VI(A) Disclosure of Conflicts",
+      "Standard I(A) Knowledge of the Law",
+      "Standard IV(A) Loyalty"
+    ],
+    "correct": 0,
+    "explain": "Standard VI(A) requires full and fair disclosure of any matter that could reasonably impair objectivity, including family holdings."
+  },
+  {
+    "id": "q18",
+    "topic": "ethics",
+    "q": "A portfolio manager places her own trade in a stock before entering the same trade for clients. This violates:",
+    "options": [
+      "Standard VI(B) Priority of Transactions",
+      "Standard III(A) Loyalty, Prudence, and Care",
+      "Standard II(B) Market Manipulation"
+    ],
+    "correct": 0,
+    "explain": "Standard VI(B) requires client transactions to have priority over transactions in which the member is the beneficial owner."
+  },
+  {
+    "id": "q19",
+    "topic": "ethics",
+    "q": "An advisor who refers clients to a mortgage broker in exchange for undisclosed referral fees violates:",
+    "options": [
+      "Standard VI(C) Referral Fees",
+      "Standard I(C) Misrepresentation",
+      "Standard V(C) Record Retention"
+    ],
+    "correct": 0,
+    "explain": "Standard VI(C) requires disclosure of any compensation or benefit received for referring clients to other service providers."
+  },
+  {
+    "id": "q20",
+    "topic": "ethics",
+    "q": "A candidate who has passed Level I but not yet earned the charter lists 'CFA Level I' on a business card. This is most likely:",
+    "options": [
+      "Permitted under Standard VII(B)",
+      "A violation of Standard VII(B) Reference to CFA Institute",
+      "Required disclosure under Standard I(A)"
+    ],
+    "correct": 1,
+    "explain": "Standard VII(B) restricts how candidates may refer to their progress; implying partial designation status misrepresents credentials."
+  },
+  {
+    "id": "q21",
+    "topic": "ethics",
+    "q": "Under the Code of Ethics, members must place the integrity of the profession and client interests:",
+    "options": [
+      "Above their own personal interests",
+      "Equal to their own personal interests",
+      "Below firm profitability targets"
+    ],
+    "correct": 0,
+    "explain": "The Code of Ethics requires members to place the interests of clients and the integrity of the profession above their own interests."
+  },
+  {
+    "id": "q22",
+    "topic": "ethics",
+    "q": "A candidate who cheats on the CFA exam violates:",
+    "options": [
+      "Standard VII(A) Conduct as Participants in CFA Institute Programs",
+      "Standard III(C) Suitability",
+      "Standard II(A) Material Nonpublic Information"
+    ],
+    "correct": 0,
+    "explain": "Standard VII(A) prohibits conduct that compromises the integrity of CFA Institute exams and programs."
+  },
+  {
+    "id": "q23",
+    "topic": "ethics",
+    "q": "GIPS (Global Investment Performance Standards) exist primarily to:",
+    "options": [
+      "Guarantee minimum investment returns",
+      "Provide standardized, comparable performance reporting across firms",
+      "Replace the CFA Code of Ethics"
+    ],
+    "correct": 1,
+    "explain": "GIPS establish a consistent methodology for calculating and presenting investment performance so results are fairly comparable."
+  },
+  {
+    "id": "q24",
+    "topic": "ethics",
+    "q": "A member using client brokerage commissions ('soft dollars') to pay for a family vacation would violate:",
+    "options": [
+      "Standard III(A) Loyalty, Prudence, and Care",
+      "Standard I(B) Independence and Objectivity",
+      "Both of the above"
+    ],
+    "correct": 2,
+    "explain": "Misusing client brokerage for personal, non-research benefit breaches the duty of loyalty and can also compromise objectivity."
+  },
+  {
+    "id": "q25",
+    "topic": "ethics",
+    "q": "When a member's personal ethical standards conflict with local law that is more permissive, the Code and Standards generally require the member to:",
+    "options": [
+      "Follow only local law",
+      "Follow the stricter of the Code/Standards or local law",
+      "Follow whichever is more convenient"
+    ],
+    "correct": 1,
+    "explain": "Members must adhere to the more strict of applicable law or the CFA Institute Code and Standards."
+  },
+  {
+    "id": "q26",
+    "topic": "ethics",
+    "q": "A member designs a compensation arrangement where his personal bonus depends only on trading volume he generates for clients. This most likely creates a conflict under:",
+    "options": [
+      "Standard I(B) Independence and Objectivity",
+      "Standard V(C) Record Retention",
+      "Standard VII(B) Reference to CFA Institute"
+    ],
+    "correct": 0,
+    "explain": "Compensation tied purely to volume can bias recommendations, threatening independence and objectivity."
+  },
+  {
+    "id": "q27",
+    "topic": "ethics",
+    "q": "An analyst who is confident in an undisclosed proprietary forecasting model may still comply with Standard V(B) by:",
+    "options": [
+      "Refusing to explain the model at all",
+      "Disclosing the general approach and key limitations without giving away trade secrets",
+      "Publishing the full source code"
+    ],
+    "correct": 1,
+    "explain": "Standard V(B) requires enough disclosure for clients to understand the process and its limitations, without requiring disclosure of proprietary detail."
+  },
+  {
+    "id": "q28",
+    "topic": "ethics",
+    "q": "A member who discloses a client's confidential information to comply with a court order is:",
+    "options": [
+      "In violation of Standard III(E)",
+      "Not in violation, since legally required disclosures are permitted",
+      "Only compliant if the client consents first"
+    ],
+    "correct": 1,
+    "explain": "Standard III(E) allows disclosure of confidential client information when required by law or legal process."
+  },
+  {
+    "id": "q29",
+    "topic": "ethics",
+    "q": "The primary purpose of the CFA Institute Professional Conduct Program is to:",
+    "options": [
+      "Enforce the Code and Standards among members and candidates",
+      "Set global securities regulation",
+      "Certify broker-dealers"
+    ],
+    "correct": 0,
+    "explain": "The Professional Conduct Program investigates and enforces compliance with the Code of Ethics and Standards of Professional Conduct."
+  },
+  {
+    "id": "q30",
+    "topic": "quant",
+    "q": "A portfolio has an expected return of 9% and a standard deviation of 15%. The approximate 95% confidence interval, assuming normality, is:",
+    "options": [
+      "9% ± 15%",
+      "9% ± 1.65 × 15%",
+      "9% ± 1.96 × 15%"
+    ],
+    "correct": 2,
+    "explain": "A 95% confidence interval under normality uses z = 1.96, giving roughly −20.4% to 38.4%."
+  },
+  {
+    "id": "q31",
+    "topic": "quant",
+    "q": "Which measure of central tendency is most sensitive to extreme outliers?",
+    "options": [
+      "Median",
+      "Mode",
+      "Arithmetic mean"
+    ],
+    "correct": 2,
+    "explain": "The mean uses the magnitude of every observation, so a single extreme value pulls it further than the median or mode."
+  },
+  {
+    "id": "q32",
+    "topic": "quant",
+    "q": "An investment promises $10,000 in 5 years. At an 8% annual discount rate, its present value is closest to:",
+    "options": [
+      "$6,806",
+      "$7,350",
+      "$10,000"
+    ],
+    "correct": 0,
+    "explain": "PV = 10,000 / (1.08)^5 ≈ $6,806."
+  },
+  {
+    "id": "q33",
+    "topic": "quant",
+    "q": "A bond investor's required return is best matched to which time value of money concept when computing bond price?",
+    "options": [
+      "Future value of a single sum",
+      "Present value of an annuity plus present value of a single sum",
+      "Effective annual rate only"
+    ],
+    "correct": 1,
+    "explain": "A bond's price is the present value of its coupon annuity plus the present value of the principal repaid at maturity."
+  },
+  {
+    "id": "q34",
+    "topic": "quant",
+    "q": "If the population standard deviation is unknown and sample size is small, the appropriate test statistic for a mean is typically the:",
+    "options": [
+      "z-statistic",
+      "t-statistic",
+      "F-statistic"
+    ],
+    "correct": 1,
+    "explain": "With an unknown population variance and small sample size, the t-distribution is used to account for added estimation uncertainty."
+  },
+  {
+    "id": "q35",
+    "topic": "quant",
+    "q": "A distribution with positive skew has:",
+    "options": [
+      "A long left tail with mean < median",
+      "A long right tail with mean > median",
+      "Equal mean and median"
+    ],
+    "correct": 1,
+    "explain": "Positive (right) skew pulls the mean above the median due to a long right tail of large positive outliers."
+  },
+  {
+    "id": "q36",
+    "topic": "quant",
+    "q": "Kurtosis measures:",
+    "options": [
+      "The central tendency of a distribution",
+      "The thickness of the tails relative to a normal distribution",
+      "The direction of skewness"
+    ],
+    "correct": 1,
+    "explain": "Kurtosis describes how fat or thin a distribution's tails are compared to a normal distribution (leptokurtic vs. platykurtic)."
+  },
+  {
+    "id": "q37",
+    "topic": "quant",
+    "q": "Two events are said to be independent if:",
+    "options": [
+      "P(A and B) = P(A) + P(B)",
+      "P(A|B) = P(A)",
+      "P(A|B) = P(B|A)"
+    ],
+    "correct": 1,
+    "explain": "Independence means knowing that B occurred does not change the probability of A, i.e., P(A|B) = P(A)."
+  },
+  {
+    "id": "q38",
+    "topic": "quant",
+    "q": "Using Bayes' formula, an updated probability after new information is called the:",
+    "options": [
+      "Prior probability",
+      "Posterior probability",
+      "Unconditional probability"
+    ],
+    "correct": 1,
+    "explain": "Bayes' formula revises a prior probability into a posterior probability once new information is incorporated."
+  },
+  {
+    "id": "q39",
+    "topic": "quant",
+    "q": "For a binomial distribution with n trials and probability of success p, the expected number of successes is:",
+    "options": [
+      "n × p",
+      "n / p",
+      "p / n"
+    ],
+    "correct": 0,
+    "explain": "The mean of a binomial distribution is n × p, the number of trials times the probability of success."
+  },
+  {
+    "id": "q40",
+    "topic": "quant",
+    "q": "In a normal distribution, approximately what percentage of observations fall within one standard deviation of the mean?",
+    "options": [
+      "50%",
+      "68%",
+      "95%"
+    ],
+    "correct": 1,
+    "explain": "For a normal distribution, about 68% of observations lie within ±1 standard deviation of the mean."
+  },
+  {
+    "id": "q41",
+    "topic": "quant",
+    "q": "A Type I error in hypothesis testing occurs when the analyst:",
+    "options": [
+      "Fails to reject a false null hypothesis",
+      "Rejects a true null hypothesis",
+      "Correctly rejects a false null hypothesis"
+    ],
+    "correct": 1,
+    "explain": "A Type I error is rejecting a null hypothesis that is actually true — a 'false positive.'"
+  },
+  {
+    "id": "q42",
+    "topic": "quant",
+    "q": "The significance level (alpha) of a hypothesis test represents:",
+    "options": [
+      "The probability of a Type II error",
+      "The probability of a Type I error",
+      "The power of the test"
+    ],
+    "correct": 1,
+    "explain": "Alpha is the probability of rejecting a true null hypothesis, i.e., committing a Type I error."
+  },
+  {
+    "id": "q43",
+    "topic": "quant",
+    "q": "Sampling error is best defined as the:",
+    "options": [
+      "Difference between a sample statistic and the population parameter",
+      "Standard deviation of the sample",
+      "Bias introduced by a flawed survey question"
+    ],
+    "correct": 0,
+    "explain": "Sampling error is simply the difference between a value computed from a sample and the true population parameter."
+  },
+  {
+    "id": "q44",
+    "topic": "quant",
+    "q": "The central limit theorem states that, for a sufficiently large sample size, the distribution of the sample mean will be approximately:",
+    "options": [
+      "Uniform",
+      "Normal, regardless of the population's distribution",
+      "Identical to the population distribution"
+    ],
+    "correct": 1,
+    "explain": "The central limit theorem holds that sample means approach a normal distribution as sample size grows, regardless of the underlying population shape."
+  },
+  {
+    "id": "q45",
+    "topic": "quant",
+    "q": "A correlation coefficient of −0.85 between two variables indicates:",
+    "options": [
+      "A weak, unclear relationship",
+      "A strong negative linear relationship",
+      "No linear relationship"
+    ],
+    "correct": 1,
+    "explain": "A correlation close to −1 indicates a strong negative linear relationship between the two variables."
+  },
+  {
+    "id": "q46",
+    "topic": "quant",
+    "q": "In a simple linear regression, the R-squared statistic measures:",
+    "options": [
+      "The slope of the regression line",
+      "The percentage of variation in the dependent variable explained by the independent variable",
+      "The standard error of the residuals"
+    ],
+    "correct": 1,
+    "explain": "R-squared is the proportion of total variance in the dependent variable explained by the independent variable(s)."
+  },
+  {
+    "id": "q47",
+    "topic": "quant",
+    "q": "The internal rate of return (IRR) of a project is the discount rate at which:",
+    "options": [
+      "NPV equals zero",
+      "NPV is maximized",
+      "Payback period is minimized"
+    ],
+    "correct": 0,
+    "explain": "IRR is defined as the discount rate that sets a project's net present value exactly to zero."
+  },
+  {
+    "id": "q48",
+    "topic": "quant",
+    "q": "If a project's NPV is positive at the firm's required rate of return, the project should generally be:",
+    "options": [
+      "Rejected, since it exceeds the hurdle rate",
+      "Accepted, since it is expected to add value",
+      "Deferred until IRR is recalculated"
+    ],
+    "correct": 1,
+    "explain": "A positive NPV indicates the project's discounted cash inflows exceed its cost, adding value to the firm."
+  },
+  {
+    "id": "q49",
+    "topic": "quant",
+    "q": "The geometric mean return is most appropriate for describing:",
+    "options": [
+      "A single period's return",
+      "Compound growth of an investment over multiple periods",
+      "The dispersion of returns"
+    ],
+    "correct": 1,
+    "explain": "The geometric mean captures compounding over multiple periods and is the correct measure of realized multi-period growth."
+  },
+  {
+    "id": "q50",
+    "topic": "quant",
+    "q": "Compared to the arithmetic mean of the same return series, the geometric mean will be:",
+    "options": [
+      "Always higher",
+      "Always lower or equal, given any variability in returns",
+      "Always equal"
+    ],
+    "correct": 1,
+    "explain": "Except when all returns are identical, the geometric mean is less than or equal to the arithmetic mean, more so with higher volatility."
+  },
+  {
+    "id": "q51",
+    "topic": "quant",
+    "q": "The coefficient of variation is calculated as:",
+    "options": [
+      "Standard deviation divided by the mean",
+      "Mean divided by standard deviation",
+      "Variance divided by the mean"
+    ],
+    "correct": 0,
+    "explain": "Coefficient of variation = standard deviation / mean, a measure of risk per unit of return."
+  },
+  {
+    "id": "q52",
+    "topic": "quant",
+    "q": "A 'point estimate' in statistical inference refers to:",
+    "options": [
+      "A range of plausible values for a parameter",
+      "A single value used to estimate a population parameter",
+      "The standard error of a sample"
+    ],
+    "correct": 1,
+    "explain": "A point estimate is a single calculated value, such as a sample mean, used to estimate an unknown population parameter."
+  },
+  {
+    "id": "q53",
+    "topic": "quant",
+    "q": "Which of the following increases the width of a confidence interval, all else equal?",
+    "options": [
+      "A larger sample size",
+      "A higher confidence level (e.g., 99% vs. 95%)",
+      "A smaller standard deviation"
+    ],
+    "correct": 1,
+    "explain": "Higher confidence levels require a wider interval to be more certain of capturing the true parameter."
+  },
+  {
+    "id": "q54",
+    "topic": "quant",
+    "q": "A stratified random sample is designed to:",
+    "options": [
+      "Randomly select from the entire population with no structure",
+      "Divide the population into subgroups and sample proportionally from each",
+      "Only sample from the largest subgroup"
+    ],
+    "correct": 1,
+    "explain": "Stratified sampling divides the population into relevant strata and samples from each, improving representativeness."
+  },
+  {
+    "id": "q55",
+    "topic": "quant",
+    "q": "In regression analysis, a residual is defined as:",
+    "options": [
+      "The predicted value of the dependent variable",
+      "The difference between the observed and predicted value of the dependent variable",
+      "The slope coefficient"
+    ],
+    "correct": 1,
+    "explain": "A residual is the observed value of the dependent variable minus the value predicted by the regression model."
+  },
+  {
+    "id": "q56",
+    "topic": "quant",
+    "q": "The effective annual rate (EAR) for a stated annual rate of 12% compounded monthly is closest to:",
+    "options": [
+      "12.00%",
+      "12.68%",
+      "13.00%"
+    ],
+    "correct": 1,
+    "explain": "EAR = (1 + 0.12/12)^12 − 1 ≈ 12.68%."
+  },
+  {
+    "id": "q57",
+    "topic": "quant",
+    "q": "An annuity due differs from an ordinary annuity in that payments occur:",
+    "options": [
+      "At the end of each period",
+      "At the beginning of each period",
+      "Only in the final period"
+    ],
+    "correct": 1,
+    "explain": "An annuity due has cash flows occurring at the start of each period, rather than the end as with an ordinary annuity."
+  },
+  {
+    "id": "q58",
+    "topic": "quant",
+    "q": "A key assumption of the simple linear regression model is that residuals are:",
+    "options": [
+      "Homoskedastic, with constant variance across observations",
+      "Always positively correlated with each other",
+      "Perfectly correlated with the independent variable"
+    ],
+    "correct": 0,
+    "explain": "Classic linear regression assumes homoskedasticity — constant residual variance across the range of the independent variable."
+  },
+  {
+    "id": "q59",
+    "topic": "quant",
+    "q": "Multicollinearity in a multiple regression refers to:",
+    "options": [
+      "High correlation among two or more independent variables",
+      "A regression with only one independent variable",
+      "Residuals that are not normally distributed"
+    ],
+    "correct": 0,
+    "explain": "Multicollinearity occurs when independent variables are highly correlated with each other, making individual coefficient estimates unstable."
+  },
+  {
+    "id": "q60",
+    "topic": "econ",
+    "q": "In a perfectly competitive market, a firm's marginal revenue is equal to:",
+    "options": [
+      "Average total cost",
+      "Market price",
+      "Marginal cost, but only at the shutdown point"
+    ],
+    "correct": 1,
+    "explain": "Perfectly competitive firms are price takers — every additional unit sells at the market price, so P = MR."
+  },
+  {
+    "id": "q61",
+    "topic": "econ",
+    "q": "All else equal, an increase in a country's real interest rates tends to cause its currency to:",
+    "options": [
+      "Depreciate",
+      "Appreciate",
+      "Be unaffected"
+    ],
+    "correct": 1,
+    "explain": "Higher real rates attract yield-seeking foreign capital, increasing demand for the currency and pushing it to appreciate."
+  },
+  {
+    "id": "q62",
+    "topic": "econ",
+    "q": "The price elasticity of demand for a good is said to be elastic when:",
+    "options": [
+      "A small price change causes a proportionally larger change in quantity demanded",
+      "Quantity demanded does not change with price",
+      "A price change causes an equally small change in quantity demanded"
+    ],
+    "correct": 0,
+    "explain": "Elastic demand means quantity demanded is highly responsive to price changes, with |elasticity| > 1."
+  },
+  {
+    "id": "q63",
+    "topic": "econ",
+    "q": "A monopolist maximizes profit at the output level where:",
+    "options": [
+      "Price equals marginal cost",
+      "Marginal revenue equals marginal cost",
+      "Average total cost is minimized"
+    ],
+    "correct": 1,
+    "explain": "Like any profit-maximizing firm, a monopolist produces where MR = MC, then prices according to the demand curve at that quantity."
+  },
+  {
+    "id": "q64",
+    "topic": "econ",
+    "q": "Which market structure is characterized by many firms selling differentiated products with some pricing power?",
+    "options": [
+      "Perfect competition",
+      "Monopolistic competition",
+      "Pure monopoly"
+    ],
+    "correct": 1,
+    "explain": "Monopolistic competition features many sellers with differentiated products, giving each some, but limited, pricing power."
+  },
+  {
+    "id": "q65",
+    "topic": "econ",
+    "q": "An increase in a firm's fixed costs, holding variable costs constant, will:",
+    "options": [
+      "Increase the profit-maximizing output level",
+      "Not change the profit-maximizing output level in the short run",
+      "Always cause the firm to shut down"
+    ],
+    "correct": 1,
+    "explain": "Fixed costs do not affect marginal cost, so the short-run profit-maximizing output (where MR = MC) is unchanged by fixed cost changes."
+  },
+  {
+    "id": "q66",
+    "topic": "econ",
+    "q": "Real GDP differs from nominal GDP in that real GDP:",
+    "options": [
+      "Is measured in current-year prices",
+      "Is adjusted for changes in the price level",
+      "Excludes government spending"
+    ],
+    "correct": 1,
+    "explain": "Real GDP adjusts nominal GDP for inflation, allowing comparison of output across time periods in constant prices."
+  },
+  {
+    "id": "q67",
+    "topic": "econ",
+    "q": "The CPI (Consumer Price Index) is best described as a measure of:",
+    "options": [
+      "Total economic output",
+      "The change in prices of a fixed basket of consumer goods and services",
+      "Corporate profit margins"
+    ],
+    "correct": 1,
+    "explain": "CPI tracks the cost over time of a representative basket of goods and services purchased by households."
+  },
+  {
+    "id": "q68",
+    "topic": "econ",
+    "q": "A central bank seeking to combat high inflation would most likely:",
+    "options": [
+      "Lower the policy interest rate",
+      "Raise the policy interest rate",
+      "Increase government spending"
+    ],
+    "correct": 1,
+    "explain": "Raising rates increases borrowing costs, cooling demand and helping to reduce inflationary pressure."
+  },
+  {
+    "id": "q69",
+    "topic": "econ",
+    "q": "Expansionary fiscal policy typically involves:",
+    "options": [
+      "Increased government spending or lower taxes",
+      "Higher interest rates set by the central bank",
+      "Reduced government spending"
+    ],
+    "correct": 0,
+    "explain": "Expansionary fiscal policy uses higher spending and/or tax cuts to stimulate aggregate demand."
+  },
+  {
+    "id": "q70",
+    "topic": "econ",
+    "q": "The unemployment rate resulting from normal labor market turnover, such as workers between jobs, is called:",
+    "options": [
+      "Cyclical unemployment",
+      "Frictional unemployment",
+      "Structural unemployment"
+    ],
+    "correct": 1,
+    "explain": "Frictional unemployment reflects short-term job search and transitions, a normal feature even of a healthy economy."
+  },
+  {
+    "id": "q71",
+    "topic": "econ",
+    "q": "Structural unemployment arises primarily from:",
+    "options": [
+      "Temporary declines in aggregate demand",
+      "A mismatch between workers' skills and available jobs",
+      "Seasonal shifts in hiring"
+    ],
+    "correct": 1,
+    "explain": "Structural unemployment occurs when there is a persistent mismatch between the skills workers have and what employers need."
+  },
+  {
+    "id": "q72",
+    "topic": "econ",
+    "q": "Comparative advantage explains why countries gain from trade because each country:",
+    "options": [
+      "Produces every good more cheaply than its trading partners",
+      "Specializes in goods it can produce at a lower opportunity cost",
+      "Restricts imports to protect domestic industry"
+    ],
+    "correct": 1,
+    "explain": "Comparative advantage means specializing where a country's opportunity cost is lowest, then trading, raises total output for all parties."
+  },
+  {
+    "id": "q73",
+    "topic": "econ",
+    "q": "A tariff imposed on imported steel will most likely:",
+    "options": [
+      "Lower the domestic price of steel",
+      "Raise the domestic price of steel and reduce import volume",
+      "Have no effect on the domestic steel market"
+    ],
+    "correct": 1,
+    "explain": "Tariffs raise the effective price of imports, which typically raises domestic prices and reduces import quantity."
+  },
+  {
+    "id": "q74",
+    "topic": "econ",
+    "q": "The aggregate demand curve slopes downward primarily because, as the price level falls:",
+    "options": [
+      "The purchasing power of money rises, increasing real spending",
+      "Business investment always falls",
+      "Government spending automatically increases"
+    ],
+    "correct": 0,
+    "explain": "A lower price level increases the real value of money holdings, boosting consumption, investment, and net exports (the wealth effect)."
+  },
+  {
+    "id": "q75",
+    "topic": "econ",
+    "q": "A negative supply shock, such as a spike in oil prices, tends to cause:",
+    "options": [
+      "Lower prices and higher output",
+      "Higher prices and lower output (stagflation-like effects)",
+      "No change in either prices or output"
+    ],
+    "correct": 1,
+    "explain": "Adverse supply shocks shift aggregate supply left, raising prices while reducing output — the classic stagflation pattern."
+  },
+  {
+    "id": "q76",
+    "topic": "econ",
+    "q": "Which best describes an oligopoly?",
+    "options": [
+      "Many small firms with no pricing power",
+      "A single firm dominating the entire market",
+      "A few large firms whose pricing decisions are interdependent"
+    ],
+    "correct": 2,
+    "explain": "Oligopoly features a small number of firms large enough that each must consider rivals' likely reactions when setting price or output."
+  },
+  {
+    "id": "q77",
+    "topic": "econ",
+    "q": "The law of diminishing marginal returns states that, holding other inputs fixed, adding more of a variable input will eventually:",
+    "options": [
+      "Increase output at an increasing rate indefinitely",
+      "Cause each additional unit of input to add less output than the previous unit",
+      "Reduce total output immediately"
+    ],
+    "correct": 1,
+    "explain": "Diminishing marginal returns means each extra unit of a variable input eventually contributes less additional output than the one before it, holding other inputs fixed."
+  },
+  {
+    "id": "q78",
+    "topic": "econ",
+    "q": "A current account deficit means a country is:",
+    "options": [
+      "Exporting more than it imports",
+      "Importing more goods and services than it exports, on a net basis",
+      "Running a government budget surplus"
+    ],
+    "correct": 1,
+    "explain": "A current account deficit reflects a country importing more (net) than it exports, financed by capital inflows."
+  },
+  {
+    "id": "q79",
+    "topic": "econ",
+    "q": "Which of the following is an example of monetary policy rather than fiscal policy?",
+    "options": [
+      "Cutting the corporate tax rate",
+      "Raising the central bank's policy interest rate",
+      "Increasing infrastructure spending"
+    ],
+    "correct": 1,
+    "explain": "Monetary policy is conducted by the central bank through tools like interest rates and reserve requirements, distinct from government tax and spending decisions."
+  },
+  {
+    "id": "q80",
+    "topic": "econ",
+    "q": "In the short run, a firm should continue operating even at a loss as long as:",
+    "options": [
+      "Price exceeds average variable cost",
+      "Price exceeds average total cost",
+      "Price equals zero"
+    ],
+    "correct": 0,
+    "explain": "As long as price covers average variable cost, the firm is contributing something toward fixed costs and should continue operating in the short run."
+  },
+  {
+    "id": "q81",
+    "topic": "econ",
+    "q": "A perfectly inelastic demand curve implies that a change in price results in:",
+    "options": [
+      "No change in quantity demanded",
+      "A proportional change in quantity demanded",
+      "An infinite change in quantity demanded"
+    ],
+    "correct": 0,
+    "explain": "Perfectly inelastic demand means quantity demanded stays fixed regardless of price changes."
+  },
+  {
+    "id": "q82",
+    "topic": "econ",
+    "q": "GDP calculated using the expenditure approach sums:",
+    "options": [
+      "Consumption, investment, government spending, and net exports",
+      "Wages, rents, interest, and profits",
+      "Only consumer spending"
+    ],
+    "correct": 0,
+    "explain": "The expenditure approach to GDP is C + I + G + (X − M): consumption, investment, government spending, and net exports."
+  },
+  {
+    "id": "q83",
+    "topic": "econ",
+    "q": "A liquidity trap describes a situation where:",
+    "options": [
+      "Monetary policy becomes ineffective because interest rates are already near zero",
+      "Fiscal policy is the only tool available to government",
+      "Inflation rises uncontrollably"
+    ],
+    "correct": 0,
+    "explain": "In a liquidity trap, further reductions in already-near-zero interest rates fail to stimulate spending, limiting monetary policy's effectiveness."
+  },
+  {
+    "id": "q84",
+    "topic": "econ",
+    "q": "Cyclical unemployment is most closely associated with:",
+    "options": [
+      "Long-term technological change",
+      "Fluctuations in the business cycle",
+      "Workers voluntarily switching jobs"
+    ],
+    "correct": 1,
+    "explain": "Cyclical unemployment rises during recessions and falls during expansions, tracking the overall business cycle."
+  },
+  {
+    "id": "q85",
+    "topic": "econ",
+    "q": "An economy operating with a positive output gap (actual GDP above potential GDP) is most likely experiencing:",
+    "options": [
+      "Deflationary pressure",
+      "Inflationary pressure",
+      "No change in price levels"
+    ],
+    "correct": 1,
+    "explain": "When actual output exceeds potential (sustainable, non-inflationary) output, resource utilization is high and inflationary pressure tends to build."
+  },
+  {
+    "id": "q86",
+    "topic": "econ",
+    "q": "A fixed exchange rate regime requires the central bank to:",
+    "options": [
+      "Let the currency float freely based on market forces",
+      "Intervene in currency markets to maintain the target exchange rate",
+      "Set interest rates independently of exchange rate considerations"
+    ],
+    "correct": 1,
+    "explain": "Under a fixed exchange rate, the central bank must buy or sell its currency as needed to keep the exchange rate at its target."
+  },
+  {
+    "id": "q87",
+    "topic": "econ",
+    "q": "Purchasing power parity (PPP) theory suggests that, in the long run, exchange rates adjust so that:",
+    "options": [
+      "Identical goods cost the same when priced in a common currency",
+      "Interest rates converge across countries",
+      "Trade balances are always zero"
+    ],
+    "correct": 0,
+    "explain": "PPP holds that exchange rates should adjust until the same basket of goods costs the same amount across countries when converted to a common currency."
+  },
+  {
+    "id": "q88",
+    "topic": "econ",
+    "q": "Which best describes the substitution effect of a price change?",
+    "options": [
+      "Consumers buy more of a good that becomes relatively cheaper compared to substitutes",
+      "Consumers' overall purchasing power changes",
+      "Firms substitute labor for capital"
+    ],
+    "correct": 0,
+    "explain": "The substitution effect describes consumers shifting purchases toward a good that has become relatively less expensive versus substitutes."
+  },
+  {
+    "id": "q89",
+    "topic": "econ",
+    "q": "A positive externality in production, such as R&D spillovers, means that:",
+    "options": [
+      "The private market tends to overproduce the good",
+      "The private market tends to underproduce the good relative to the social optimum",
+      "There is no difference between private and social benefit"
+    ],
+    "correct": 1,
+    "explain": "With positive externalities, private benefit understates social benefit, so unregulated markets tend to underproduce the good."
+  },
+  {
+    "id": "q90",
+    "topic": "fra",
+    "q": "Under accrual accounting, revenue is recognized when it is:",
+    "options": [
+      "Collected in cash",
+      "Earned, regardless of when cash is received",
+      "Invoiced to the customer"
+    ],
+    "correct": 1,
+    "explain": "Accrual accounting matches revenue recognition to delivery of goods or services, independent of cash timing."
+  },
+  {
+    "id": "q91",
+    "topic": "fra",
+    "q": "A company capitalizes, rather than expenses, a cost. In the year of the expenditure this will, all else equal:",
+    "options": [
+      "Lower net income and lower total assets",
+      "Raise net income and raise total assets",
+      "Leave net income unchanged but raise total assets"
+    ],
+    "correct": 1,
+    "explain": "Capitalizing defers the expense onto the balance sheet as an asset, which boosts current-year net income relative to expensing it outright."
+  },
+  {
+    "id": "q92",
+    "topic": "fra",
+    "q": "Under the FIFO inventory method during a period of rising prices, compared to LIFO, FIFO will report:",
+    "options": [
+      "Higher cost of goods sold and lower net income",
+      "Lower cost of goods sold and higher net income",
+      "Identical cost of goods sold"
+    ],
+    "correct": 1,
+    "explain": "FIFO expenses the oldest, cheaper inventory first, resulting in lower COGS and higher net income when prices are rising."
+  },
+  {
+    "id": "q93",
+    "topic": "fra",
+    "q": "Which financial statement reports a company's financial position at a single point in time?",
+    "options": [
+      "Income statement",
+      "Balance sheet",
+      "Statement of cash flows"
+    ],
+    "correct": 1,
+    "explain": "The balance sheet is a snapshot of assets, liabilities, and equity as of a specific date."
+  },
+  {
+    "id": "q94",
+    "topic": "fra",
+    "q": "Depreciation expense on the income statement primarily reflects:",
+    "options": [
+      "The decline in an asset's market value",
+      "The systematic allocation of an asset's cost over its useful life",
+      "A cash outflow in the current period"
+    ],
+    "correct": 1,
+    "explain": "Depreciation allocates the historical cost of a long-lived asset over its useful life; it is a non-cash expense."
+  },
+  {
+    "id": "q95",
+    "topic": "fra",
+    "q": "A deferred tax liability typically arises when:",
+    "options": [
+      "Taxable income exceeds pretax financial income",
+      "Pretax financial income exceeds taxable income",
+      "Tax rates are identical across all jurisdictions"
+    ],
+    "correct": 1,
+    "explain": "When financial (book) income exceeds taxable income due to timing differences, a company records a deferred tax liability for taxes that will be paid later."
+  },
+  {
+    "id": "q96",
+    "topic": "fra",
+    "q": "Operating leases historically kept certain lease obligations off the balance sheet; under current major standards (e.g., IFRS 16 / ASC 842), lessees generally must:",
+    "options": [
+      "Continue to exclude nearly all leases from the balance sheet",
+      "Recognize a right-of-use asset and lease liability for most leases",
+      "Only report leases in the footnotes"
+    ],
+    "correct": 1,
+    "explain": "Modern lease accounting standards require lessees to capitalize most leases, recording a right-of-use asset and corresponding liability."
+  },
+  {
+    "id": "q97",
+    "topic": "fra",
+    "q": "The current ratio is calculated as:",
+    "options": [
+      "Current assets divided by current liabilities",
+      "Current liabilities divided by current assets",
+      "Cash divided by current liabilities"
+    ],
+    "correct": 0,
+    "explain": "Current ratio = current assets / current liabilities, a common measure of short-term liquidity."
+  },
+  {
+    "id": "q98",
+    "topic": "fra",
+    "q": "A company's quick ratio differs from its current ratio primarily by excluding:",
+    "options": [
+      "Accounts receivable",
+      "Cash and cash equivalents",
+      "Inventory (and sometimes other less liquid current assets)"
+    ],
+    "correct": 2,
+    "explain": "The quick ratio (acid-test) removes inventory and other less-liquid items from current assets to focus on the most liquid resources."
+  },
+  {
+    "id": "q99",
+    "topic": "fra",
+    "q": "The debt-to-equity ratio is a measure of a firm's:",
+    "options": [
+      "Profitability",
+      "Financial leverage",
+      "Asset turnover"
+    ],
+    "correct": 1,
+    "explain": "Debt-to-equity compares total debt to shareholders' equity, indicating how much leverage the firm uses to finance assets."
+  },
+  {
+    "id": "q100",
+    "topic": "fra",
+    "q": "Return on equity (ROE) can be decomposed via the DuPont framework into:",
+    "options": [
+      "Net margin, asset turnover, and financial leverage",
+      "Current ratio and quick ratio",
+      "Gross margin and operating margin only"
+    ],
+    "correct": 0,
+    "explain": "The DuPont decomposition splits ROE into net profit margin × asset turnover × financial leverage (equity multiplier)."
+  },
+  {
+    "id": "q101",
+    "topic": "fra",
+    "q": "In the statement of cash flows, proceeds from issuing long-term debt are classified under:",
+    "options": [
+      "Operating activities",
+      "Investing activities",
+      "Financing activities"
+    ],
+    "correct": 2,
+    "explain": "Cash flows from issuing or repaying debt and equity are classified as financing activities."
+  },
+  {
+    "id": "q102",
+    "topic": "fra",
+    "q": "Purchases of property, plant, and equipment appear in the statement of cash flows under:",
+    "options": [
+      "Operating activities",
+      "Investing activities",
+      "Financing activities"
+    ],
+    "correct": 1,
+    "explain": "Capital expenditures on long-lived assets are classified as investing activities."
+  },
+  {
+    "id": "q103",
+    "topic": "fra",
+    "q": "A company that consistently reports net income well above operating cash flow may be a red flag for:",
+    "options": [
+      "Conservative accounting",
+      "Aggressive revenue recognition or earnings quality concerns",
+      "Strong working capital management"
+    ],
+    "correct": 1,
+    "explain": "A persistent gap where net income exceeds operating cash flow can signal aggressive accruals or earnings quality issues worth investigating."
+  },
+  {
+    "id": "q104",
+    "topic": "fra",
+    "q": "Gross profit margin is calculated as:",
+    "options": [
+      "(Revenue − COGS) / Revenue",
+      "Net income / Revenue",
+      "Operating income / Revenue"
+    ],
+    "correct": 0,
+    "explain": "Gross margin measures the percentage of revenue remaining after subtracting cost of goods sold."
+  },
+  {
+    "id": "q105",
+    "topic": "fra",
+    "q": "Under the indirect method of preparing the cash flow statement, the starting point is:",
+    "options": [
+      "Cash collected from customers",
+      "Net income, adjusted for non-cash items and working capital changes",
+      "Total assets"
+    ],
+    "correct": 1,
+    "explain": "The indirect method reconciles net income to operating cash flow by adjusting for non-cash items like depreciation and changes in working capital."
+  },
+  {
+    "id": "q106",
+    "topic": "fra",
+    "q": "An increase in accounts receivable during a period, all else equal, will:",
+    "options": [
+      "Increase operating cash flow",
+      "Decrease operating cash flow relative to net income",
+      "Have no effect on cash flow"
+    ],
+    "correct": 1,
+    "explain": "A rise in receivables means sales were made on credit rather than collected in cash, reducing operating cash flow relative to net income."
+  },
+  {
+    "id": "q107",
+    "topic": "fra",
+    "q": "Goodwill on a company's balance sheet typically arises from:",
+    "options": [
+      "Organic growth in brand value",
+      "An acquisition where purchase price exceeds the fair value of net identifiable assets",
+      "Revaluation of property, plant, and equipment"
+    ],
+    "correct": 1,
+    "explain": "Goodwill is recorded when an acquirer pays more than the fair value of the target's identifiable net assets."
+  },
+  {
+    "id": "q108",
+    "topic": "fra",
+    "q": "Under US GAAP, internally generated goodwill is:",
+    "options": [
+      "Capitalized on the balance sheet",
+      "Never recorded as an asset",
+      "Amortized over 40 years"
+    ],
+    "correct": 1,
+    "explain": "Internally generated goodwill is not recognized as an asset; goodwill is only recorded when acquired in a business combination."
+  },
+  {
+    "id": "q109",
+    "topic": "fra",
+    "q": "A company switches from straight-line to accelerated depreciation. In the early years of an asset's life, this change will:",
+    "options": [
+      "Increase reported net income",
+      "Decrease reported net income",
+      "Have no effect on net income"
+    ],
+    "correct": 1,
+    "explain": "Accelerated depreciation front-loads larger depreciation expense in early years, reducing net income relative to straight-line."
+  },
+  {
+    "id": "q110",
+    "topic": "fra",
+    "q": "Which inventory method best matches current costs with current revenues on the income statement during inflation?",
+    "options": [
+      "FIFO",
+      "LIFO",
+      "Weighted average cost"
+    ],
+    "correct": 1,
+    "explain": "LIFO expenses the most recently purchased (higher-cost) inventory first, better matching current costs to current sales revenue."
+  },
+  {
+    "id": "q111",
+    "topic": "fra",
+    "q": "An asset impairment charge on the income statement reflects:",
+    "options": [
+      "A write-down of an asset's carrying value below its recoverable amount",
+      "An increase in an asset's useful life",
+      "A change in depreciation method only"
+    ],
+    "correct": 0,
+    "explain": "Impairment recognizes that an asset's carrying value on the books exceeds what it can realistically generate or be sold for, requiring a write-down."
+  },
+  {
+    "id": "q112",
+    "topic": "fra",
+    "q": "Times interest earned (interest coverage ratio) measures a firm's ability to:",
+    "options": [
+      "Pay dividends",
+      "Cover interest expense from operating earnings",
+      "Meet short-term liquidity needs"
+    ],
+    "correct": 1,
+    "explain": "Interest coverage = EBIT / interest expense, indicating how comfortably operating earnings cover interest obligations."
+  },
+  {
+    "id": "q113",
+    "topic": "fra",
+    "q": "A company that uses aggressive assumptions to recognize revenue earlier than its economic substance warrants is most likely engaging in:",
+    "options": [
+      "Conservative accounting",
+      "Earnings management",
+      "GAAP-compliant best practice"
+    ],
+    "correct": 1,
+    "explain": "Recognizing revenue prematurely, inconsistent with economic substance, is a classic earnings management red flag."
+  },
+  {
+    "id": "q114",
+    "topic": "fra",
+    "q": "Common-size financial statements express each line item as a percentage of:",
+    "options": [
+      "Net income",
+      "A base figure such as total revenue (income statement) or total assets (balance sheet)",
+      "The prior year's total assets"
+    ],
+    "correct": 1,
+    "explain": "Common-size statements scale each line to a base (revenue for the income statement, total assets for the balance sheet), aiding cross-company comparison."
+  },
+  {
+    "id": "q115",
+    "topic": "fra",
+    "q": "An increase in a company's inventory turnover ratio generally indicates:",
+    "options": [
+      "Slower moving inventory",
+      "Inventory is being sold and replaced more quickly",
+      "Rising obsolescence risk"
+    ],
+    "correct": 1,
+    "explain": "Higher inventory turnover suggests inventory is selling through more quickly relative to average inventory held."
+  },
+  {
+    "id": "q116",
+    "topic": "fra",
+    "q": "Under IFRS, both a single-step and multi-step income statement format are permitted; the multi-step format specifically highlights:",
+    "options": [
+      "Only net income",
+      "Intermediate subtotals such as gross profit and operating income",
+      "Only comprehensive income"
+    ],
+    "correct": 1,
+    "explain": "A multi-step income statement separates operating and non-operating items into subtotals like gross profit and operating income, aiding analysis."
+  },
+  {
+    "id": "q117",
+    "topic": "fra",
+    "q": "A stock dividend, unlike a cash dividend, will:",
+    "options": [
+      "Reduce total shareholders' equity",
+      "Not change total shareholders' equity, only its composition",
+      "Increase total assets"
+    ],
+    "correct": 1,
+    "explain": "A stock dividend reallocates amounts within equity (from retained earnings to contributed capital) without changing total equity or assets."
+  },
+  {
+    "id": "q118",
+    "topic": "fra",
+    "q": "Free cash flow to the firm (FCFF) is generally derived starting from:",
+    "options": [
+      "Net income or cash flow from operations, adjusted for after-tax interest, capex, and working capital changes",
+      "Total revenue only",
+      "Gross profit only"
+    ],
+    "correct": 0,
+    "explain": "FCFF is typically built up from net income or CFO, adding back after-tax interest and subtracting capital expenditures and working capital investment."
+  },
+  {
+    "id": "q119",
+    "topic": "fra",
+    "q": "A high and rising days sales outstanding (DSO) most likely signals:",
+    "options": [
+      "Faster collection of receivables",
+      "Slower collection of receivables from customers",
+      "Declining inventory levels"
+    ],
+    "correct": 1,
+    "explain": "Rising DSO means it is taking longer, on average, to collect cash from credit sales — a potential liquidity or credit-quality concern."
+  },
+  {
+    "id": "q120",
+    "topic": "corp",
+    "q": "The weighted average cost of capital (WACC) is used primarily to:",
+    "options": [
+      "Set a firm's dividend payout ratio",
+      "Discount a project's expected cash flows to test whether it creates value",
+      "Compute a firm's earnings per share"
+    ],
+    "correct": 1,
+    "explain": "WACC blends the required returns of debt and equity holders and serves as the discount rate in capital budgeting decisions like NPV."
+  },
+  {
+    "id": "q121",
+    "topic": "corp",
+    "q": "All else equal, an increase in a firm's financial leverage will:",
+    "options": [
+      "Decrease the volatility of ROE",
+      "Increase the volatility of ROE",
+      "Have no effect on ROE"
+    ],
+    "correct": 1,
+    "explain": "Leverage magnifies both gains and losses that flow to equity holders, which increases the volatility of return on equity."
+  },
+  {
+    "id": "q122",
+    "topic": "corp",
+    "q": "Under Modigliani-Miller's Proposition I (no taxes), a firm's capital structure:",
+    "options": [
+      "Affects firm value",
+      "Does not affect firm value",
+      "Only affects value if debt exceeds 50%"
+    ],
+    "correct": 1,
+    "explain": "MM Proposition I (without taxes) holds that, under idealized assumptions, firm value is independent of how it is financed."
+  },
+  {
+    "id": "q123",
+    "topic": "corp",
+    "q": "With corporate taxes included, Modigliani-Miller's model implies that firm value:",
+    "options": [
+      "Decreases with more debt due to the interest tax shield",
+      "Increases with more debt due to the interest tax shield",
+      "Is unaffected by debt levels"
+    ],
+    "correct": 1,
+    "explain": "With taxes, interest payments are tax-deductible, creating a tax shield that increases firm value as leverage rises, up to a point."
+  },
+  {
+    "id": "q124",
+    "topic": "corp",
+    "q": "The payback period capital budgeting method is most criticized for:",
+    "options": [
+      "Ignoring the time value of money and cash flows beyond the payback point",
+      "Being too complex to calculate",
+      "Requiring knowledge of the firm's WACC"
+    ],
+    "correct": 0,
+    "explain": "Payback period ignores discounting and any cash flows occurring after the payback threshold is reached, a key theoretical weakness."
+  },
+  {
+    "id": "q125",
+    "topic": "corp",
+    "q": "A project has an NPV of $0 at a 10% discount rate. This implies its IRR is:",
+    "options": [
+      "Below 10%",
+      "Approximately 10%",
+      "Above 10%"
+    ],
+    "correct": 1,
+    "explain": "By definition, IRR is the discount rate at which NPV equals zero, so NPV = 0 at 10% implies IRR ≈ 10%."
+  },
+  {
+    "id": "q126",
+    "topic": "corp",
+    "q": "Net working capital is defined as:",
+    "options": [
+      "Current assets minus current liabilities",
+      "Total assets minus total liabilities",
+      "Cash minus short-term debt"
+    ],
+    "correct": 0,
+    "explain": "Net working capital = current assets − current liabilities, a measure of short-term operating liquidity."
+  },
+  {
+    "id": "q127",
+    "topic": "corp",
+    "q": "A firm tightening its credit terms to customers will most likely:",
+    "options": [
+      "Increase sales and receivables",
+      "Reduce receivables but potentially reduce sales as well",
+      "Have no effect on receivables"
+    ],
+    "correct": 1,
+    "explain": "Stricter credit terms typically reduce receivables and days sales outstanding but may also discourage some marginal sales."
+  },
+  {
+    "id": "q128",
+    "topic": "corp",
+    "q": "The primary goal of working capital management is to:",
+    "options": [
+      "Maximize inventory levels",
+      "Balance liquidity needs against the cost of holding current assets",
+      "Eliminate all short-term debt"
+    ],
+    "correct": 1,
+    "explain": "Working capital management seeks an efficient balance between maintaining liquidity and minimizing the opportunity cost of excess current assets."
+  },
+  {
+    "id": "q129",
+    "topic": "corp",
+    "q": "A residual dividend policy implies that dividends are paid:",
+    "options": [
+      "Before any capital investment decisions are made",
+      "Only out of earnings remaining after funding all attractive investment projects",
+      "At a fixed percentage of revenue"
+    ],
+    "correct": 1,
+    "explain": "Under a residual policy, the firm funds its capital budget first and distributes whatever earnings remain as dividends."
+  },
+  {
+    "id": "q130",
+    "topic": "corp",
+    "q": "A stock buyback, relative to an equivalent cash dividend, will generally:",
+    "options": [
+      "Reduce the number of shares outstanding and can raise EPS",
+      "Increase the number of shares outstanding",
+      "Have no effect on shares outstanding"
+    ],
+    "correct": 0,
+    "explain": "Share repurchases reduce shares outstanding, which, all else equal, tends to increase earnings per share."
+  },
+  {
+    "id": "q131",
+    "topic": "corp",
+    "q": "Which corporate governance mechanism is designed to align management's interests with shareholders?",
+    "options": [
+      "Cumulative voting only",
+      "Executive stock-based compensation tied to performance",
+      "Increasing management's fixed salary"
+    ],
+    "correct": 1,
+    "explain": "Performance-based equity compensation is a common tool to align executives' incentives with long-term shareholder value creation."
+  },
+  {
+    "id": "q132",
+    "topic": "corp",
+    "q": "A classified (staggered) board of directors, where only a fraction of directors are elected each year, is generally viewed as:",
+    "options": [
+      "Shareholder-friendly, since it increases turnover",
+      "Less shareholder-friendly, since it can entrench management",
+      "Irrelevant to governance quality"
+    ],
+    "correct": 1,
+    "explain": "Staggered boards make it harder for shareholders to replace the board quickly, often viewed as an entrenchment device."
+  },
+  {
+    "id": "q133",
+    "topic": "corp",
+    "q": "The cost of equity capital is often estimated using:",
+    "options": [
+      "The after-tax cost of debt",
+      "The Capital Asset Pricing Model (CAPM)",
+      "The firm's current dividend payout ratio alone"
+    ],
+    "correct": 1,
+    "explain": "CAPM (risk-free rate + beta × equity risk premium) is a standard approach for estimating the required return on equity."
+  },
+  {
+    "id": "q134",
+    "topic": "corp",
+    "q": "An increase in a company's beta, all else equal, will:",
+    "options": [
+      "Decrease its estimated cost of equity under CAPM",
+      "Increase its estimated cost of equity under CAPM",
+      "Have no effect on cost of equity"
+    ],
+    "correct": 1,
+    "explain": "Under CAPM, a higher beta implies greater systematic risk, raising the required return (cost of equity) investors demand."
+  },
+  {
+    "id": "q135",
+    "topic": "corp",
+    "q": "A leveraged buyout (LBO) is characterized by:",
+    "options": [
+      "Acquiring a company using primarily equity financing",
+      "Acquiring a company using a significant proportion of borrowed funds",
+      "A merger between two equally sized public firms"
+    ],
+    "correct": 1,
+    "explain": "LBOs use substantial debt, often secured against the target's own assets and cash flows, to finance the acquisition."
+  },
+  {
+    "id": "q136",
+    "topic": "corp",
+    "q": "In a merger, 'synergies' refer to:",
+    "options": [
+      "The combined firm's value being less than the sum of the two standalone firms",
+      "The combined firm's value being greater than the sum of the two standalone firms",
+      "Regulatory approval requirements"
+    ],
+    "correct": 1,
+    "explain": "Synergies are the additional value created when the combined entity is worth more than the two firms would be worth separately."
+  },
+  {
+    "id": "q137",
+    "topic": "corp",
+    "q": "A firm's operating leverage refers to the extent to which:",
+    "options": [
+      "It uses debt financing",
+      "Fixed operating costs are used relative to variable costs in its cost structure",
+      "It uses derivatives to hedge risk"
+    ],
+    "correct": 1,
+    "explain": "Operating leverage reflects the proportion of fixed versus variable costs; higher fixed costs mean profits are more sensitive to changes in sales volume."
+  },
+  {
+    "id": "q138",
+    "topic": "corp",
+    "q": "A firm with high operating leverage will generally experience:",
+    "options": [
+      "More stable operating income as sales fluctuate",
+      "More volatile operating income as sales fluctuate",
+      "No relationship between sales and operating income"
+    ],
+    "correct": 1,
+    "explain": "High fixed costs relative to variable costs amplify the swings in operating income as sales volumes change."
+  },
+  {
+    "id": "q139",
+    "topic": "corp",
+    "q": "Which of the following best exemplifies a stakeholder (rather than pure shareholder) view of corporate governance?",
+    "options": [
+      "Maximizing short-term share price only",
+      "Considering the interests of employees, customers, and communities alongside shareholders",
+      "Ignoring regulatory requirements"
+    ],
+    "correct": 1,
+    "explain": "A stakeholder view broadens corporate focus beyond shareholders alone to include other parties affected by the firm's actions."
+  },
+  {
+    "id": "q140",
+    "topic": "corp",
+    "q": "ESG factors in corporate analysis stand for:",
+    "options": [
+      "Earnings, Sales, Growth",
+      "Environmental, Social, and Governance",
+      "Equity, Solvency, Gearing"
+    ],
+    "correct": 1,
+    "explain": "ESG refers to Environmental, Social, and Governance factors increasingly used to assess non-financial risks and practices."
+  },
+  {
+    "id": "q141",
+    "topic": "corp",
+    "q": "The marginal cost of capital schedule typically:",
+    "options": [
+      "Stays flat regardless of how much capital is raised",
+      "Rises as a firm raises increasingly large amounts of new capital",
+      "Falls as more capital is raised"
+    ],
+    "correct": 1,
+    "explain": "As a firm raises more capital, it often must pay higher rates (e.g., using more expensive financing sources), raising the marginal cost of capital."
+  },
+  {
+    "id": "q142",
+    "topic": "corp",
+    "q": "A breakpoint in the marginal cost of capital schedule occurs when:",
+    "options": [
+      "The cost of a specific capital component changes as more of it is raised",
+      "Net income is exactly zero",
+      "The firm pays out 100% of earnings as dividends"
+    ],
+    "correct": 0,
+    "explain": "Breakpoints mark the funding level at which the cost of a capital source (e.g., debt or equity) changes, shifting the overall WACC."
+  },
+  {
+    "id": "q143",
+    "topic": "corp",
+    "q": "A firm evaluating mutually exclusive projects of different sizes should generally rely primarily on:",
+    "options": [
+      "The project with the highest IRR regardless of size",
+      "NPV, since it directly measures value added in currency terms",
+      "Payback period alone"
+    ],
+    "correct": 1,
+    "explain": "NPV correctly accounts for the scale and timing of cash flows, making it the preferred criterion when comparing mutually exclusive projects."
+  },
+  {
+    "id": "q144",
+    "topic": "corp",
+    "q": "Agency costs in a corporation arise primarily from:",
+    "options": [
+      "Perfect alignment between managers and shareholders",
+      "Conflicts of interest between managers (agents) and shareholders (principals)",
+      "The absence of any board oversight"
+    ],
+    "correct": 1,
+    "explain": "Agency costs stem from the separation of ownership and control, where managers may act in their own interest rather than shareholders'."
+  },
+  {
+    "id": "q145",
+    "topic": "corp",
+    "q": "A poison pill takeover defense is designed to:",
+    "options": [
+      "Make a hostile takeover more expensive or difficult for the acquirer",
+      "Increase the target's dividend payout",
+      "Reduce the target's total assets"
+    ],
+    "correct": 0,
+    "explain": "Poison pills typically dilute an acquirer's stake or impose costs, deterring hostile takeover attempts."
+  },
+  {
+    "id": "q146",
+    "topic": "corp",
+    "q": "Trade credit as a source of short-term financing is generally:",
+    "options": [
+      "Always the cheapest financing option available",
+      "Potentially costly if early payment discounts are foregone",
+      "Only available to publicly traded firms"
+    ],
+    "correct": 1,
+    "explain": "Failing to take an available early-payment discount on trade credit implies a high effective annual financing cost."
+  },
+  {
+    "id": "q147",
+    "topic": "corp",
+    "q": "A firm's target capital structure refers to:",
+    "options": [
+      "Its current mix of debt and equity only",
+      "The mix of debt and equity it aims to maintain over the long run",
+      "The mix mandated by regulators"
+    ],
+    "correct": 1,
+    "explain": "A target capital structure is the long-run debt/equity mix management believes minimizes WACC and maximizes firm value."
+  },
+  {
+    "id": "q148",
+    "topic": "corp",
+    "q": "In evaluating a capital project, which cash flows should be included?",
+    "options": [
+      "All historical costs already incurred (sunk costs)",
+      "Only incremental cash flows directly attributable to the project",
+      "Only financing cash flows such as interest payments"
+    ],
+    "correct": 1,
+    "explain": "Capital budgeting should include only incremental (relevant) cash flows the project generates, excluding sunk costs and financing flows already reflected in the discount rate."
+  },
+  {
+    "id": "q149",
+    "topic": "corp",
+    "q": "A firm's degree of total leverage combines the effects of:",
+    "options": [
+      "Operating leverage and financial leverage together",
+      "Only financial leverage",
+      "Only the current ratio"
+    ],
+    "correct": 0,
+    "explain": "Degree of total leverage (DOL × DFL) captures how both fixed operating costs and fixed financing costs together amplify the effect of a change in sales on earnings per share."
+  },
+  {
+    "id": "q150",
+    "topic": "equity",
+    "q": "A stock's justified P/E ratio tends to be higher, all else equal, when:",
+    "options": [
+      "Expected earnings growth is higher",
+      "The required rate of return is higher",
+      "The payout ratio is lower, with growth unchanged"
+    ],
+    "correct": 0,
+    "explain": "Higher expected growth raises the present value of future earnings relative to current earnings, lifting the justified P/E."
+  },
+  {
+    "id": "q151",
+    "topic": "equity",
+    "q": "In a perfectly efficient market, security prices:",
+    "options": [
+      "Reflect all available information",
+      "Can be reliably beaten using technical analysis alone",
+      "Can be reliably beaten using fundamental analysis alone"
+    ],
+    "correct": 0,
+    "explain": "The efficient market hypothesis holds that prices fully incorporate available information, making consistent outperformance difficult."
+  },
+  {
+    "id": "q152",
+    "topic": "equity",
+    "q": "The dividend discount model (DDM) values a stock as the present value of:",
+    "options": [
+      "Expected future dividends",
+      "Expected future revenues",
+      "Book value of equity"
+    ],
+    "correct": 0,
+    "explain": "DDM values equity as the discounted sum of all expected future dividend payments to shareholders."
+  },
+  {
+    "id": "q153",
+    "topic": "equity",
+    "q": "Under the Gordon growth (constant growth) DDM, a stock's value increases when, all else equal:",
+    "options": [
+      "The required return rises",
+      "The expected dividend growth rate rises",
+      "The current dividend falls"
+    ],
+    "correct": 1,
+    "explain": "In P0 = D1 / (r − g), a higher growth rate g increases the numerator's future trajectory and raises the valuation, holding r constant."
+  },
+  {
+    "id": "q154",
+    "topic": "equity",
+    "q": "Free cash flow to equity (FCFE) represents cash flow available to:",
+    "options": [
+      "All capital providers, including debt and equity",
+      "Common shareholders only, after debt obligations are met",
+      "Bondholders only"
+    ],
+    "correct": 1,
+    "explain": "FCFE is the cash flow remaining for common equity holders after all operating expenses, taxes, capital investment, and net debt payments."
+  },
+  {
+    "id": "q155",
+    "topic": "equity",
+    "q": "Relative valuation methods, such as P/E or P/B multiples, value a stock primarily by:",
+    "options": [
+      "Discounting its own projected cash flows",
+      "Comparing it to similar, comparable companies",
+      "Estimating its liquidation value"
+    ],
+    "correct": 1,
+    "explain": "Relative valuation benchmarks a company's multiples against comparable firms or the market/industry to infer relative value."
+  },
+  {
+    "id": "q156",
+    "topic": "equity",
+    "q": "The price-to-book (P/B) ratio compares a company's market value to its:",
+    "options": [
+      "Net income",
+      "Book value of equity",
+      "Total revenue"
+    ],
+    "correct": 1,
+    "explain": "P/B = market price per share / book value per share, comparing market valuation to accounting net asset value."
+  },
+  {
+    "id": "q157",
+    "topic": "equity",
+    "q": "A stock exchange's main index, such as a broad market-cap-weighted index, gives the largest weight to companies with:",
+    "options": [
+      "The lowest share price",
+      "The largest market capitalization",
+      "The highest dividend yield"
+    ],
+    "correct": 1,
+    "explain": "In a market-cap-weighted index, larger companies (by total market value) have proportionally greater influence on the index."
+  },
+  {
+    "id": "q158",
+    "topic": "equity",
+    "q": "Preferred stock differs from common stock primarily in that preferred shareholders typically:",
+    "options": [
+      "Have voting rights but no dividend priority",
+      "Have priority on dividends and in liquidation but usually no voting rights",
+      "Always convert automatically into bonds"
+    ],
+    "correct": 1,
+    "explain": "Preferred shareholders generally receive dividends and liquidation proceeds ahead of common shareholders but typically lack voting rights."
+  },
+  {
+    "id": "q159",
+    "topic": "equity",
+    "q": "An initial public offering (IPO) takes place in the:",
+    "options": [
+      "Secondary market",
+      "Primary market",
+      "Derivatives market"
+    ],
+    "correct": 1,
+    "explain": "An IPO is the first sale of shares by a company directly to investors, which occurs in the primary market."
+  },
+  {
+    "id": "q160",
+    "topic": "equity",
+    "q": "Once shares trade between investors on an exchange after the IPO, this activity occurs in the:",
+    "options": [
+      "Primary market",
+      "Secondary market",
+      "Private placement market"
+    ],
+    "correct": 1,
+    "explain": "Trading among investors after issuance takes place in the secondary market, such as a stock exchange."
+  },
+  {
+    "id": "q161",
+    "topic": "equity",
+    "q": "Under CAPM, a stock's expected return depends on:",
+    "options": [
+      "Its total risk (standard deviation) only",
+      "Its systematic risk (beta) and the market risk premium",
+      "Its dividend yield only"
+    ],
+    "correct": 1,
+    "explain": "CAPM expresses expected return as the risk-free rate plus beta times the market (equity) risk premium, capturing only systematic risk."
+  },
+  {
+    "id": "q162",
+    "topic": "equity",
+    "q": "A stock with a beta greater than 1.0 is expected to be:",
+    "options": [
+      "Less volatile than the overall market",
+      "More volatile than the overall market",
+      "Uncorrelated with the market"
+    ],
+    "correct": 1,
+    "explain": "Beta above 1.0 implies the stock's returns tend to amplify market moves, making it more volatile than the market as a whole."
+  },
+  {
+    "id": "q163",
+    "topic": "equity",
+    "q": "Porter's Five Forces framework is used to analyze:",
+    "options": [
+      "A single stock's historical price pattern",
+      "The competitive intensity and attractiveness of an industry",
+      "A firm's capital structure only"
+    ],
+    "correct": 1,
+    "explain": "Porter's framework evaluates industry attractiveness through five competitive forces: rivalry, new entrants, substitutes, and buyer/supplier power."
+  },
+  {
+    "id": "q164",
+    "topic": "equity",
+    "q": "A company operating in an industry with high barriers to entry is more likely to sustain:",
+    "options": [
+      "Lower long-run profitability due to constant new competition",
+      "Higher long-run profitability due to limited new competition",
+      "No pricing power at all"
+    ],
+    "correct": 1,
+    "explain": "High entry barriers limit new competitors, helping incumbent firms sustain above-normal profitability over time."
+  },
+  {
+    "id": "q165",
+    "topic": "equity",
+    "q": "The weak form of the efficient market hypothesis asserts that current prices fully reflect:",
+    "options": [
+      "All public and private information",
+      "All historical price and volume information",
+      "Only insider information"
+    ],
+    "correct": 1,
+    "explain": "Weak-form efficiency holds that past price and volume data are already reflected in current prices, making technical analysis alone unreliable."
+  },
+  {
+    "id": "q166",
+    "topic": "equity",
+    "q": "The semi-strong form of the efficient market hypothesis asserts that prices reflect:",
+    "options": [
+      "All publicly available information",
+      "Only historical prices",
+      "Only insider, nonpublic information"
+    ],
+    "correct": 0,
+    "explain": "Semi-strong form efficiency holds that prices incorporate all publicly available information, including financial statements and news."
+  },
+  {
+    "id": "q167",
+    "topic": "equity",
+    "q": "A stock split (e.g., 2-for-1) will, all else equal:",
+    "options": [
+      "Increase the total market capitalization of the company",
+      "Leave total market capitalization roughly unchanged while increasing shares outstanding",
+      "Decrease shares outstanding"
+    ],
+    "correct": 1,
+    "explain": "A stock split increases the number of shares while proportionally reducing price per share, leaving total market value essentially unchanged."
+  },
+  {
+    "id": "q168",
+    "topic": "equity",
+    "q": "Which of the following best describes a growth investing style?",
+    "options": [
+      "Seeking undervalued stocks trading below intrinsic value",
+      "Seeking companies expected to grow earnings faster than the market",
+      "Seeking only high dividend-yield stocks"
+    ],
+    "correct": 1,
+    "explain": "Growth investing focuses on companies expected to grow revenue and earnings at an above-average rate, often at higher valuation multiples."
+  },
+  {
+    "id": "q169",
+    "topic": "equity",
+    "q": "Value investing style is most associated with:",
+    "options": [
+      "Buying stocks that appear cheap relative to fundamentals such as earnings or book value",
+      "Buying only high-growth technology companies",
+      "Ignoring valuation multiples entirely"
+    ],
+    "correct": 0,
+    "explain": "Value investors seek securities trading at a discount to intrinsic value based on fundamentals such as low P/E or P/B ratios."
+  },
+  {
+    "id": "q170",
+    "topic": "equity",
+    "q": "A company's dividend payout ratio is calculated as:",
+    "options": [
+      "Dividends per share divided by earnings per share",
+      "Earnings per share divided by dividends per share",
+      "Book value divided by dividends per share"
+    ],
+    "correct": 0,
+    "explain": "Payout ratio = dividends per share / earnings per share, indicating the proportion of earnings distributed to shareholders."
+  },
+  {
+    "id": "q171",
+    "topic": "equity",
+    "q": "The retention ratio (plowback ratio) is:",
+    "options": [
+      "Equal to the payout ratio",
+      "Equal to 1 minus the payout ratio",
+      "Unrelated to the payout ratio"
+    ],
+    "correct": 1,
+    "explain": "Retention ratio = 1 − payout ratio, representing the portion of earnings reinvested in the business rather than paid out."
+  },
+  {
+    "id": "q172",
+    "topic": "equity",
+    "q": "A sustainable growth rate for a company can be approximated as:",
+    "options": [
+      "Retention ratio × ROE",
+      "Payout ratio × ROE",
+      "ROE divided by retention ratio"
+    ],
+    "correct": 0,
+    "explain": "Sustainable growth rate = retention ratio × return on equity, estimating growth financeable without external equity issuance."
+  },
+  {
+    "id": "q173",
+    "topic": "equity",
+    "q": "An American Depositary Receipt (ADR) allows investors to:",
+    "options": [
+      "Trade a foreign company's shares on a US exchange in USD",
+      "Only trade US Treasury securities",
+      "Short-sell foreign currencies directly"
+    ],
+    "correct": 0,
+    "explain": "ADRs represent shares of a foreign company, traded and settled in US dollars on US exchanges, easing access for US investors."
+  },
+  {
+    "id": "q174",
+    "topic": "equity",
+    "q": "Which of the following is a characteristic of a private equity investment versus a public equity investment?",
+    "options": [
+      "Daily liquidity on an exchange",
+      "Illiquidity, with capital typically locked up for years",
+      "Continuous public price discovery"
+    ],
+    "correct": 1,
+    "explain": "Private equity investments are generally illiquid, with investors committing capital for extended holding periods before exit."
+  },
+  {
+    "id": "q175",
+    "topic": "equity",
+    "q": "A stock's dividend yield is calculated as:",
+    "options": [
+      "Annual dividends per share divided by price per share",
+      "Price per share divided by annual dividends per share",
+      "Earnings per share divided by price per share"
+    ],
+    "correct": 0,
+    "explain": "Dividend yield = annual dividend per share / current share price, expressing the cash return from dividends alone."
+  },
+  {
+    "id": "q176",
+    "topic": "equity",
+    "q": "An equity index fund's primary objective is generally to:",
+    "options": [
+      "Outperform its benchmark index through active stock selection",
+      "Closely track the performance of a specified benchmark index",
+      "Hold only fixed income securities"
+    ],
+    "correct": 1,
+    "explain": "Index funds aim to replicate, not beat, a specified benchmark by holding its constituent securities in similar proportions."
+  },
+  {
+    "id": "q177",
+    "topic": "equity",
+    "q": "A tender offer in the context of equity markets refers to:",
+    "options": [
+      "A company's routine quarterly earnings announcement",
+      "A public offer to purchase shares directly from shareholders, often at a premium",
+      "A method of paying dividends"
+    ],
+    "correct": 1,
+    "explain": "A tender offer is a public bid to buy shares directly from existing shareholders, commonly used in takeover attempts, usually above market price."
+  },
+  {
+    "id": "q178",
+    "topic": "equity",
+    "q": "Free float in the context of an equity index refers to:",
+    "options": [
+      "All shares issued by the company, including those closely held by insiders",
+      "Shares readily available for public trading, excluding closely held or restricted shares",
+      "Only preferred shares"
+    ],
+    "correct": 1,
+    "explain": "Free float excludes shares held by insiders, governments, or other strategic holders not available for public trading, refining index weightings."
+  },
+  {
+    "id": "q179",
+    "topic": "equity",
+    "q": "A company with a high return on invested capital (ROIC) relative to its cost of capital is generally:",
+    "options": [
+      "Destroying shareholder value",
+      "Creating shareholder value by earning more than its capital costs",
+      "Unrelated to shareholder value"
+    ],
+    "correct": 1,
+    "explain": "When ROIC exceeds the cost of capital, a firm generates returns above what investors require, creating economic value for shareholders."
+  },
+  {
+    "id": "q180",
+    "topic": "fixed",
+    "q": "When market interest rates rise, the price of an existing fixed-rate bond will:",
+    "options": [
+      "Rise",
+      "Fall",
+      "Stay the same"
+    ],
+    "correct": 1,
+    "explain": "Bond prices and yields move inversely — higher discount rates lower the present value of the bond's fixed cash flows."
+  },
+  {
+    "id": "q181",
+    "topic": "fixed",
+    "q": "A bond with a higher duration is:",
+    "options": [
+      "Less sensitive to interest rate changes",
+      "More sensitive to interest rate changes",
+      "Unaffected by interest rate changes"
+    ],
+    "correct": 1,
+    "explain": "Duration approximates price sensitivity to yield changes — a higher duration means larger price swings for a given rate move."
+  },
+  {
+    "id": "q182",
+    "topic": "fixed",
+    "q": "A bond's yield to maturity (YTM) is the discount rate that:",
+    "options": [
+      "Equates the bond's price to the present value of its cash flows",
+      "Equals the bond's coupon rate exactly",
+      "Reflects only the bond's credit rating"
+    ],
+    "correct": 0,
+    "explain": "YTM is the internal rate of return that makes the present value of a bond's coupons and principal equal to its current market price."
+  },
+  {
+    "id": "q183",
+    "topic": "fixed",
+    "q": "A bond trading at a discount to par has a market price that is:",
+    "options": [
+      "Above face value",
+      "Below face value",
+      "Exactly equal to face value"
+    ],
+    "correct": 1,
+    "explain": "A discount bond trades below its par (face) value, which occurs when its coupon rate is below prevailing market yields."
+  },
+  {
+    "id": "q184",
+    "topic": "fixed",
+    "q": "A bond's coupon rate exceeds its yield to maturity. The bond is most likely trading:",
+    "options": [
+      "At a premium",
+      "At a discount",
+      "At par"
+    ],
+    "correct": 0,
+    "explain": "When coupon > YTM, investors are willing to pay more than face value, so the bond trades at a premium."
+  },
+  {
+    "id": "q185",
+    "topic": "fixed",
+    "q": "The yield curve depicting yields across different maturities is typically upward sloping (normal) when:",
+    "options": [
+      "Short-term rates exceed long-term rates",
+      "Long-term rates exceed short-term rates, reflecting factors like inflation and term premiums",
+      "All maturities have identical yields"
+    ],
+    "correct": 1,
+    "explain": "A normal yield curve slopes upward, with longer maturities commanding higher yields to compensate for greater interest rate and inflation risk."
+  },
+  {
+    "id": "q186",
+    "topic": "fixed",
+    "q": "An inverted yield curve, where short-term yields exceed long-term yields, is often viewed by markets as:",
+    "options": [
+      "A sign of strong economic expansion ahead",
+      "A potential signal of economic slowdown or recession",
+      "Irrelevant to economic forecasting"
+    ],
+    "correct": 1,
+    "explain": "Yield curve inversions have historically preceded economic slowdowns, as markets price in expectations of future rate cuts."
+  },
+  {
+    "id": "q187",
+    "topic": "fixed",
+    "q": "Convexity in bond pricing refers to:",
+    "options": [
+      "The linear relationship between bond price and yield",
+      "The curvature in the price-yield relationship, causing duration-based estimates to be imperfect",
+      "A measure of credit risk only"
+    ],
+    "correct": 1,
+    "explain": "Convexity captures the fact that the price-yield relationship is curved, not linear, so duration alone imperfectly estimates large price changes."
+  },
+  {
+    "id": "q188",
+    "topic": "fixed",
+    "q": "A bond with positive convexity will, for a given change in yield, experience:",
+    "options": [
+      "Symmetric price changes for equal rises and falls in yield",
+      "Larger price gains for a yield decrease than price losses for an equal yield increase",
+      "No price change at all"
+    ],
+    "correct": 1,
+    "explain": "Positive convexity means bond prices rise more when yields fall than they fall when yields rise by the same amount — a favorable asymmetry."
+  },
+  {
+    "id": "q189",
+    "topic": "fixed",
+    "q": "Credit risk on a bond refers to the risk that:",
+    "options": [
+      "Interest rates will change",
+      "The issuer will fail to make timely interest or principal payments",
+      "The bond's price will be volatile due to liquidity"
+    ],
+    "correct": 1,
+    "explain": "Credit (default) risk is the risk that the bond issuer fails to meet its contractual debt obligations."
+  },
+  {
+    "id": "q190",
+    "topic": "fixed",
+    "q": "Bonds rated BBB-/Baa3 or above by major rating agencies are generally classified as:",
+    "options": [
+      "High-yield (junk) bonds",
+      "Investment-grade bonds",
+      "Defaulted bonds"
+    ],
+    "correct": 1,
+    "explain": "Ratings of BBB-/Baa3 and above are considered investment grade, while ratings below that threshold are high-yield or speculative grade."
+  },
+  {
+    "id": "q191",
+    "topic": "fixed",
+    "q": "A callable bond gives the issuer the right to:",
+    "options": [
+      "Extend the bond's maturity",
+      "Redeem the bond before maturity, typically when rates have fallen",
+      "Convert the bond into equity"
+    ],
+    "correct": 1,
+    "explain": "A call feature lets issuers redeem the bond early, often to refinance at lower rates when market rates decline."
+  },
+  {
+    "id": "q192",
+    "topic": "fixed",
+    "q": "Compared to an otherwise identical option-free bond, a callable bond will generally have:",
+    "options": [
+      "A lower yield, since the option benefits the investor",
+      "A higher yield, to compensate investors for the call risk they bear",
+      "An identical yield"
+    ],
+    "correct": 1,
+    "explain": "Investors demand extra yield for bearing call risk, since the issuer can redeem the bond early when it is advantageous to the issuer, not the investor."
+  },
+  {
+    "id": "q193",
+    "topic": "fixed",
+    "q": "A putable bond gives the bondholder the right to:",
+    "options": [
+      "Sell the bond back to the issuer at a predetermined price before maturity",
+      "Convert the bond into the issuer's common stock",
+      "Extend the bond's maturity date"
+    ],
+    "correct": 0,
+    "explain": "A put feature lets bondholders sell the bond back to the issuer at a set price, protecting against rising rates or credit deterioration."
+  },
+  {
+    "id": "q194",
+    "topic": "fixed",
+    "q": "Mortgage-backed securities (MBS) are primarily exposed to which risk not typically found in a standard corporate bond?",
+    "options": [
+      "Prepayment risk",
+      "Foreign exchange risk",
+      "Equity market risk"
+    ],
+    "correct": 0,
+    "explain": "MBS investors face prepayment risk, as underlying mortgage borrowers may repay principal early, especially when rates fall."
+  },
+  {
+    "id": "q195",
+    "topic": "fixed",
+    "q": "A bond's credit spread is best described as:",
+    "options": [
+      "The difference between its yield and that of a comparable-maturity risk-free (e.g., government) bond",
+      "The difference between its coupon rate and par value",
+      "Its duration minus its convexity"
+    ],
+    "correct": 0,
+    "explain": "Credit spread is the extra yield investors demand over a risk-free benchmark to compensate for credit and liquidity risk."
+  },
+  {
+    "id": "q196",
+    "topic": "fixed",
+    "q": "A zero-coupon bond's price is most sensitive to interest rate changes relative to a coupon bond of the same maturity because:",
+    "options": [
+      "Its duration equals its maturity, the maximum possible for that maturity",
+      "It pays coupons semiannually",
+      "It has no credit risk"
+    ],
+    "correct": 0,
+    "explain": "With no coupon payments, a zero-coupon bond's Macaulay duration exactly equals its maturity, maximizing interest rate sensitivity for that maturity."
+  },
+  {
+    "id": "q197",
+    "topic": "fixed",
+    "q": "Securitization is the process of:",
+    "options": [
+      "Converting illiquid loans or receivables into tradable securities",
+      "Rating a bond issuer's creditworthiness",
+      "Setting a central bank's policy rate"
+    ],
+    "correct": 0,
+    "explain": "Securitization pools financial assets like mortgages or loans and repackages them into securities that can be sold to investors."
+  },
+  {
+    "id": "q198",
+    "topic": "fixed",
+    "q": "A sinking fund provision in a bond indenture requires the issuer to:",
+    "options": [
+      "Pay a higher coupon rate over time",
+      "Periodically retire a portion of the bond issue before final maturity",
+      "Convert the bonds into preferred stock"
+    ],
+    "correct": 1,
+    "explain": "Sinking fund provisions require the issuer to systematically retire part of the debt issue over time, reducing the amount due at final maturity."
+  },
+  {
+    "id": "q199",
+    "topic": "fixed",
+    "q": "A floating-rate note's coupon payments are:",
+    "options": [
+      "Fixed for the life of the bond",
+      "Periodically reset based on a reference rate plus a spread",
+      "Paid only at maturity"
+    ],
+    "correct": 1,
+    "explain": "Floating-rate notes have coupons that reset periodically based on a benchmark rate (e.g., a policy rate) plus a fixed spread."
+  },
+  {
+    "id": "q200",
+    "topic": "fixed",
+    "q": "Reinvestment risk refers to the risk that:",
+    "options": [
+      "Future coupon payments must be reinvested at rates lower than the original yield",
+      "Bond prices will never change",
+      "The issuer will default immediately"
+    ],
+    "correct": 0,
+    "explain": "Reinvestment risk is the risk that cash flows received (coupons or principal) must be reinvested at a lower rate than originally expected."
+  },
+  {
+    "id": "q201",
+    "topic": "fixed",
+    "q": "A barbell bond portfolio strategy combines:",
+    "options": [
+      "Only intermediate-maturity bonds",
+      "Short-maturity and long-maturity bonds, with little in intermediate maturities",
+      "Only bonds of a single maturity"
+    ],
+    "correct": 1,
+    "explain": "A barbell strategy concentrates holdings at the short and long ends of the maturity spectrum, avoiding intermediate maturities."
+  },
+  {
+    "id": "q202",
+    "topic": "fixed",
+    "q": "A bullet bond portfolio strategy concentrates bond maturities:",
+    "options": [
+      "Around a single target maturity date",
+      "At the very short end and very long end only",
+      "Evenly across all maturities"
+    ],
+    "correct": 0,
+    "explain": "A bullet strategy clusters bond maturities around one target date, often matching a specific future liability."
+  },
+  {
+    "id": "q203",
+    "topic": "fixed",
+    "q": "Which type of bond typically carries the lowest credit risk among the following?",
+    "options": [
+      "High-yield corporate bond",
+      "Investment-grade sovereign (government) bond from a stable economy",
+      "Unsecured subordinated corporate debt"
+    ],
+    "correct": 1,
+    "explain": "Sovereign bonds from stable, creditworthy governments generally carry the lowest default risk among common bond types."
+  },
+  {
+    "id": "q204",
+    "topic": "fixed",
+    "q": "A step-up bond is structured so that its coupon rate:",
+    "options": [
+      "Decreases over time",
+      "Increases at predetermined dates over the bond's life",
+      "Remains fixed throughout its life"
+    ],
+    "correct": 1,
+    "explain": "Step-up bonds have a coupon that rises at scheduled intervals, often used to compensate investors as call risk or other factors evolve."
+  },
+  {
+    "id": "q205",
+    "topic": "fixed",
+    "q": "Duration measures approximately:",
+    "options": [
+      "The percentage price change of a bond for a 1% change in yield",
+      "The bond's exact maturity date",
+      "The bond's credit rating"
+    ],
+    "correct": 0,
+    "explain": "Modified duration approximates the percentage change in a bond's price for a small (1%) change in yield."
+  },
+  {
+    "id": "q206",
+    "topic": "fixed",
+    "q": "A laddered bond portfolio holds bonds with:",
+    "options": [
+      "Identical maturities",
+      "Maturities spread evenly across a range of dates",
+      "Only the shortest available maturities"
+    ],
+    "correct": 1,
+    "explain": "A bond ladder spreads maturities evenly over time, providing regular reinvestment opportunities and reducing interest rate timing risk."
+  },
+  {
+    "id": "q207",
+    "topic": "fixed",
+    "q": "An issuer's credit rating downgrade will most likely cause the issuer's existing bond prices to:",
+    "options": [
+      "Rise, as credit risk falls",
+      "Fall, as required yields rise to compensate for higher perceived credit risk",
+      "Remain completely unaffected"
+    ],
+    "correct": 1,
+    "explain": "A downgrade signals higher default risk, causing investors to demand a higher yield, which lowers the bond's market price."
+  },
+  {
+    "id": "q208",
+    "topic": "fixed",
+    "q": "The 'flight to quality' phenomenon in bond markets refers to investors:",
+    "options": [
+      "Selling government bonds in favor of high-yield corporate debt during stress",
+      "Shifting into higher-quality, lower-risk bonds (e.g., government debt) during periods of market stress",
+      "Ignoring credit ratings entirely"
+    ],
+    "correct": 1,
+    "explain": "During market turmoil, investors often rotate into safer, higher-quality bonds, driving up their prices and lowering their yields."
+  },
+  {
+    "id": "q209",
+    "topic": "fixed",
+    "q": "A bond's current yield is calculated as:",
+    "options": [
+      "Annual coupon payment divided by the bond's current market price",
+      "Annual coupon payment divided by par value",
+      "Yield to maturity minus the coupon rate"
+    ],
+    "correct": 0,
+    "explain": "Current yield = annual coupon / current market price, a simple (incomplete) measure that ignores the time value of money and price changes to maturity."
+  },
+  {
+    "id": "q210",
+    "topic": "deriv",
+    "q": "The buyer of a call option has the right to:",
+    "options": [
+      "Sell the underlying at the strike price",
+      "Buy the underlying at the strike price",
+      "Buy the underlying at the current market price"
+    ],
+    "correct": 1,
+    "explain": "A call option grants its holder the right, not the obligation, to buy the underlying asset at the strike price."
+  },
+  {
+    "id": "q211",
+    "topic": "deriv",
+    "q": "The maximum possible loss for the buyer of a put option is:",
+    "options": [
+      "Unlimited",
+      "The strike price",
+      "The premium paid"
+    ],
+    "correct": 2,
+    "explain": "The option buyer's downside is capped at the premium paid — worst case, they let it expire worthless."
+  },
+  {
+    "id": "q212",
+    "topic": "deriv",
+    "q": "A forward contract obligates both parties to:",
+    "options": [
+      "Optionally exchange the underlying asset at a future date",
+      "Exchange the underlying asset at a specified price on a specified future date",
+      "Only exchange cash, never the underlying asset"
+    ],
+    "correct": 1,
+    "explain": "Forward contracts are binding agreements requiring both parties to transact the underlying asset at the agreed price and date."
+  },
+  {
+    "id": "q213",
+    "topic": "deriv",
+    "q": "Compared to a forward contract, a futures contract is:",
+    "options": [
+      "Privately negotiated and not exchange-traded",
+      "Standardized and exchange-traded with daily mark-to-market settlement",
+      "Never subject to counterparty risk"
+    ],
+    "correct": 1,
+    "explain": "Futures are standardized, exchange-traded contracts that are marked to market daily, reducing (but not eliminating) counterparty risk versus forwards."
+  },
+  {
+    "id": "q214",
+    "topic": "deriv",
+    "q": "The seller (writer) of a call option, if exercised, is obligated to:",
+    "options": [
+      "Buy the underlying at the strike price",
+      "Sell the underlying at the strike price",
+      "Do nothing, since only buyers have obligations"
+    ],
+    "correct": 1,
+    "explain": "If a call is exercised, the writer must deliver (sell) the underlying asset to the buyer at the agreed strike price."
+  },
+  {
+    "id": "q215",
+    "topic": "deriv",
+    "q": "Put-call parity describes the relationship between the prices of:",
+    "options": [
+      "A call, a put, the underlying, and a risk-free bond with matching strike and expiration",
+      "Two calls with different strike prices only",
+      "A forward and a futures contract"
+    ],
+    "correct": 0,
+    "explain": "Put-call parity links a European call, a European put, the underlying asset, and a risk-free bond to prevent arbitrage opportunities."
+  },
+  {
+    "id": "q216",
+    "topic": "deriv",
+    "q": "An interest rate swap typically involves the exchange of:",
+    "options": [
+      "Fixed-rate payments for floating-rate payments between two counterparties",
+      "Two different currencies",
+      "Equity shares for bonds"
+    ],
+    "correct": 0,
+    "explain": "A plain vanilla interest rate swap exchanges a stream of fixed-rate payments for floating-rate payments based on a notional principal."
+  },
+  {
+    "id": "q217",
+    "topic": "deriv",
+    "q": "A speculator who believes a stock price will rise significantly could use options to gain leveraged exposure by:",
+    "options": [
+      "Selling a put option",
+      "Buying a call option",
+      "Selling a call option"
+    ],
+    "correct": 1,
+    "explain": "Buying calls provides leveraged upside exposure to a price increase, with loss limited to the premium paid."
+  },
+  {
+    "id": "q218",
+    "topic": "deriv",
+    "q": "A company wanting to hedge against rising future fuel costs would most likely:",
+    "options": [
+      "Sell fuel futures contracts",
+      "Buy fuel futures contracts",
+      "Avoid derivatives entirely"
+    ],
+    "correct": 1,
+    "explain": "Buying futures locks in a purchase price today, protecting the company against future price increases in the commodity it needs."
+  },
+  {
+    "id": "q219",
+    "topic": "deriv",
+    "q": "The intrinsic value of a call option is calculated as:",
+    "options": [
+      "Max(0, underlying price − strike price)",
+      "Max(0, strike price − underlying price)",
+      "Always equal to the option premium"
+    ],
+    "correct": 0,
+    "explain": "A call's intrinsic value is the greater of zero or the amount by which the underlying price exceeds the strike price."
+  },
+  {
+    "id": "q220",
+    "topic": "deriv",
+    "q": "A call option is described as 'in the money' when:",
+    "options": [
+      "The underlying price is below the strike price",
+      "The underlying price is above the strike price",
+      "The strike price equals the underlying price exactly"
+    ],
+    "correct": 1,
+    "explain": "A call option has positive intrinsic value, i.e., is in the money, when the underlying's price exceeds the strike price."
+  },
+  {
+    "id": "q221",
+    "topic": "deriv",
+    "q": "Time value of an option is defined as:",
+    "options": [
+      "The option's total premium minus its intrinsic value",
+      "The option's intrinsic value alone",
+      "The strike price minus the premium"
+    ],
+    "correct": 0,
+    "explain": "Time value reflects the possibility the option becomes more valuable before expiration; it equals premium minus intrinsic value."
+  },
+  {
+    "id": "q222",
+    "topic": "deriv",
+    "q": "As an option approaches expiration, all else equal, its time value will typically:",
+    "options": [
+      "Increase",
+      "Decrease toward zero",
+      "Remain constant"
+    ],
+    "correct": 1,
+    "explain": "Time value decays as expiration approaches, a phenomenon known as time decay, approaching zero at expiration."
+  },
+  {
+    "id": "q223",
+    "topic": "deriv",
+    "q": "A futures contract's daily settlement process, where gains and losses are credited or debited to margin accounts, is called:",
+    "options": [
+      "Marking to market",
+      "Delta hedging",
+      "Cash-and-carry arbitrage"
+    ],
+    "correct": 0,
+    "explain": "Marking to market settles gains and losses on futures positions daily based on the change in the settlement price."
+  },
+  {
+    "id": "q224",
+    "topic": "deriv",
+    "q": "Which derivative strategy involves simultaneously buying the underlying asset and buying a put option on it?",
+    "options": [
+      "Covered call",
+      "Protective put",
+      "Straddle"
+    ],
+    "correct": 1,
+    "explain": "A protective put pairs a long position in the underlying with a long put, limiting downside risk while preserving upside potential."
+  },
+  {
+    "id": "q225",
+    "topic": "deriv",
+    "q": "A covered call strategy involves:",
+    "options": [
+      "Owning the underlying asset and selling a call option against it",
+      "Selling the underlying asset short and buying a call",
+      "Buying both a call and a put with the same strike"
+    ],
+    "correct": 0,
+    "explain": "A covered call combines a long position in the underlying with a short call, generating premium income but capping upside."
+  },
+  {
+    "id": "q226",
+    "topic": "deriv",
+    "q": "A long straddle involves:",
+    "options": [
+      "Buying a call and buying a put with the same strike and expiration",
+      "Selling a call and selling a put with the same strike and expiration",
+      "Buying a call and selling a put"
+    ],
+    "correct": 0,
+    "explain": "A long straddle profits from large price moves in either direction, buying both a call and put at the same strike and expiration."
+  },
+  {
+    "id": "q227",
+    "topic": "deriv",
+    "q": "An investor entering a long straddle expects:",
+    "options": [
+      "Low volatility and a stable price",
+      "High volatility, with a large move in either direction",
+      "The underlying price to stay exactly at the strike"
+    ],
+    "correct": 1,
+    "explain": "Straddle buyers profit from large price swings in either direction, essentially a bet on high volatility."
+  },
+  {
+    "id": "q228",
+    "topic": "deriv",
+    "q": "The delta of an option measures:",
+    "options": [
+      "The sensitivity of the option's price to a change in the underlying asset's price",
+      "The time remaining until expiration",
+      "The option's strike price"
+    ],
+    "correct": 0,
+    "explain": "Delta approximates how much an option's price changes for a small change in the price of the underlying asset."
+  },
+  {
+    "id": "q229",
+    "topic": "deriv",
+    "q": "A forward rate agreement (FRA) is used primarily to:",
+    "options": [
+      "Hedge or speculate on future short-term interest rates",
+      "Trade physical commodities",
+      "Hedge equity market risk"
+    ],
+    "correct": 0,
+    "explain": "FRAs allow parties to lock in or speculate on a future short-term interest rate for a specified notional amount and period."
+  },
+  {
+    "id": "q230",
+    "topic": "deriv",
+    "q": "Which of the following best describes arbitrage in derivatives markets?",
+    "options": [
+      "Taking on significant directional market risk for potential high reward",
+      "Exploiting price discrepancies to earn a riskless profit",
+      "Holding a position until expiration regardless of price movement"
+    ],
+    "correct": 1,
+    "explain": "Arbitrage involves simultaneous transactions that lock in a riskless profit from mispricings, with no net market exposure."
+  },
+  {
+    "id": "q231",
+    "topic": "deriv",
+    "q": "A currency swap primarily involves the exchange of:",
+    "options": [
+      "Interest and often principal payments denominated in two different currencies",
+      "Only interest payments in the same currency",
+      "Equity shares between two companies"
+    ],
+    "correct": 0,
+    "explain": "Currency swaps exchange principal and/or interest payments in one currency for those in another between two counterparties."
+  },
+  {
+    "id": "q232",
+    "topic": "deriv",
+    "q": "Which position has theoretically unlimited potential loss?",
+    "options": [
+      "Buying a call option",
+      "Buying a put option",
+      "Selling (writing) an uncovered call option"
+    ],
+    "correct": 2,
+    "explain": "A naked short call has theoretically unlimited loss potential, since the underlying price can rise without bound."
+  },
+  {
+    "id": "q233",
+    "topic": "deriv",
+    "q": "An option's vega measures its sensitivity to changes in:",
+    "options": [
+      "The underlying asset's implied volatility",
+      "Interest rates",
+      "Time to expiration"
+    ],
+    "correct": 0,
+    "explain": "Vega captures how much an option's price changes for a change in the implied volatility of the underlying asset."
+  },
+  {
+    "id": "q234",
+    "topic": "deriv",
+    "q": "A binomial option pricing model values an option by:",
+    "options": [
+      "Assuming the underlying price can only move to one of two possible values over each period",
+      "Assuming continuous, infinite possible price paths",
+      "Ignoring the risk-free rate entirely"
+    ],
+    "correct": 0,
+    "explain": "The binomial model discretizes price movement into up and down states over each period, building a tree of possible outcomes to value the option."
+  },
+  {
+    "id": "q235",
+    "topic": "deriv",
+    "q": "No-arbitrage pricing of a forward contract on a non-dividend-paying stock uses which key input, beyond spot price?",
+    "options": [
+      "The risk-free interest rate and time to expiration",
+      "The company's historical earnings growth",
+      "The company's dividend payout ratio, always"
+    ],
+    "correct": 0,
+    "explain": "The forward price under no-arbitrage equals the spot price compounded at the risk-free rate over the time to expiration (absent dividends)."
+  },
+  {
+    "id": "q236",
+    "topic": "deriv",
+    "q": "A collar strategy typically combines:",
+    "options": [
+      "A long position in the underlying, a long put, and a short call",
+      "Two long calls with different strikes",
+      "Two short puts with different strikes"
+    ],
+    "correct": 0,
+    "explain": "A collar protects a long underlying position by buying a protective put and financing it (partly) by selling a covered call."
+  },
+  {
+    "id": "q237",
+    "topic": "deriv",
+    "q": "Which of the following is a primary economic function of derivatives markets?",
+    "options": [
+      "Eliminating all investment risk from the financial system",
+      "Allowing efficient transfer of risk between parties who want to hedge and those willing to bear it",
+      "Guaranteeing profits to all participants"
+    ],
+    "correct": 1,
+    "explain": "Derivatives allow risk to be transferred from those who wish to hedge it to those willing to bear it (often speculators), improving overall market efficiency."
+  },
+  {
+    "id": "q238",
+    "topic": "deriv",
+    "q": "An option's gamma measures:",
+    "options": [
+      "The rate of change of delta with respect to the underlying price",
+      "The option's exposure to interest rate changes",
+      "The bid-ask spread of the option"
+    ],
+    "correct": 0,
+    "explain": "Gamma captures how much an option's delta changes as the underlying asset's price changes, indicating the convexity of the option's payoff."
+  },
+  {
+    "id": "q239",
+    "topic": "deriv",
+    "q": "A contango futures market is one in which:",
+    "options": [
+      "Futures prices are below the expected spot price",
+      "Futures prices are above the expected spot price",
+      "Futures and spot prices are always identical"
+    ],
+    "correct": 1,
+    "explain": "In contango, futures prices exceed the current spot price, often reflecting storage costs, financing costs, and the cost of carry."
+  },
+  {
+    "id": "q240",
+    "topic": "alt",
+    "q": "Compared to traditional investments, alternative investments such as private equity or hedge funds typically feature:",
+    "options": [
+      "Higher liquidity and lower fees",
+      "Lower liquidity and higher fees",
+      "Identical liquidity and fee structures"
+    ],
+    "correct": 1,
+    "explain": "Alternatives commonly involve lock-up periods, less transparency, and higher fee structures such as '2 and 20'."
+  },
+  {
+    "id": "q241",
+    "topic": "alt",
+    "q": "A key characteristic of real estate as an asset class is that it:",
+    "options": [
+      "Offers no diversification benefit versus equities",
+      "Can provide income and some inflation-hedging characteristics",
+      "Always outperforms equities in every period"
+    ],
+    "correct": 1,
+    "explain": "Real estate often generates rental income and its value can track inflation, giving it diversification value against stocks and bonds."
+  },
+  {
+    "id": "q242",
+    "topic": "alt",
+    "q": "A hedge fund's '2 and 20' fee structure refers to:",
+    "options": [
+      "A 2% management fee and 20% performance fee",
+      "A 20% management fee and 2% performance fee",
+      "A 2-year minimum lock-up and 20% redemption fee"
+    ],
+    "correct": 0,
+    "explain": "'2 and 20' is shorthand for a typical hedge fund fee structure: roughly 2% annual management fee plus 20% of profits above a benchmark or hurdle."
+  },
+  {
+    "id": "q243",
+    "topic": "alt",
+    "q": "A hedge fund's 'high-water mark' provision ensures that performance fees are only charged:",
+    "options": [
+      "Every year regardless of performance",
+      "On new profits above the fund's previous highest value",
+      "Only in years the fund loses money"
+    ],
+    "correct": 1,
+    "explain": "A high-water mark prevents managers from charging performance fees again on gains that merely recover prior losses."
+  },
+  {
+    "id": "q244",
+    "topic": "alt",
+    "q": "Venture capital investing typically targets:",
+    "options": [
+      "Mature, publicly traded companies",
+      "Early-stage or growth-stage private companies with high growth potential",
+      "Government bonds exclusively"
+    ],
+    "correct": 1,
+    "explain": "Venture capital funds provide financing to young, often pre-profit companies in exchange for equity, betting on high future growth."
+  },
+  {
+    "id": "q245",
+    "topic": "alt",
+    "q": "A leveraged buyout (LBO) fund primarily creates value through:",
+    "options": [
+      "Buying public equity index funds",
+      "Acquiring companies using significant debt, then improving operations and/or paying down debt before exit",
+      "Trading currencies short-term"
+    ],
+    "correct": 1,
+    "explain": "LBO funds acquire companies with substantial leverage, aiming to improve performance and delever before an eventual exit (sale or IPO)."
+  },
+  {
+    "id": "q246",
+    "topic": "alt",
+    "q": "A REIT (Real Estate Investment Trust) allows investors to:",
+    "options": [
+      "Gain diversified real estate exposure through a publicly traded, liquid security",
+      "Only invest directly in physical property with no liquidity",
+      "Avoid all real estate market risk"
+    ],
+    "correct": 0,
+    "explain": "REITs pool real estate assets into a security that trades on exchanges, offering investors liquid, diversified real estate exposure."
+  },
+  {
+    "id": "q247",
+    "topic": "alt",
+    "q": "Commodities are often added to a portfolio primarily for their:",
+    "options": [
+      "Guaranteed positive returns",
+      "Potential diversification benefits and inflation-hedging characteristics",
+      "Complete lack of price volatility"
+    ],
+    "correct": 1,
+    "explain": "Commodities often have low correlation with stocks and bonds and can help hedge against inflation, aiding portfolio diversification."
+  },
+  {
+    "id": "q248",
+    "topic": "alt",
+    "q": "A market-neutral hedge fund strategy aims to:",
+    "options": [
+      "Maximize exposure to overall market direction",
+      "Generate returns independent of broad market movements by balancing long and short positions",
+      "Only hold long positions in equities"
+    ],
+    "correct": 1,
+    "explain": "Market-neutral strategies pair long and short positions to minimize net market exposure, seeking to profit from relative security selection."
+  },
+  {
+    "id": "q249",
+    "topic": "alt",
+    "q": "Infrastructure investments, such as toll roads or utilities, are often attractive to institutional investors for their:",
+    "options": [
+      "High volatility and short investment horizons",
+      "Stable, often inflation-linked long-term cash flows",
+      "Complete absence of regulatory risk"
+    ],
+    "correct": 1,
+    "explain": "Infrastructure assets often generate predictable, long-duration cash flows, sometimes linked to inflation, appealing to long-horizon investors."
+  },
+  {
+    "id": "q250",
+    "topic": "alt",
+    "q": "A key due diligence concern specific to hedge fund investing is:",
+    "options": [
+      "The complete absence of any fees",
+      "Limited transparency into the fund's actual holdings and strategy",
+      "Guaranteed daily liquidity"
+    ],
+    "correct": 1,
+    "explain": "Hedge funds often disclose limited information about specific positions, making thorough due diligence on strategy and risk management essential."
+  },
+  {
+    "id": "q251",
+    "topic": "alt",
+    "q": "Private equity funds typically require investors to commit capital for a period of approximately:",
+    "options": [
+      "A few days",
+      "10 years or more, given the closed-end fund structure",
+      "Only until the next business day"
+    ],
+    "correct": 1,
+    "explain": "Private equity is typically structured as closed-end funds with long lock-up periods, often a decade or more, reflecting illiquid underlying investments."
+  },
+  {
+    "id": "q252",
+    "topic": "alt",
+    "q": "A fund of hedge funds provides investors with:",
+    "options": [
+      "Direct access to a single hedge fund strategy only",
+      "Diversified exposure across multiple underlying hedge funds, layered with an additional fee",
+      "Guaranteed capital protection"
+    ],
+    "correct": 1,
+    "explain": "Funds of funds diversify across several hedge funds but add an extra layer of fees on top of the underlying funds' own fees."
+  },
+  {
+    "id": "q253",
+    "topic": "alt",
+    "q": "Digital assets such as Bitcoin are generally characterized by:",
+    "options": [
+      "Low historical price volatility",
+      "High historical price volatility and an evolving regulatory landscape",
+      "Government-guaranteed value"
+    ],
+    "correct": 1,
+    "explain": "Cryptocurrencies have historically exhibited large price swings and operate within a regulatory environment that is still developing."
+  },
+  {
+    "id": "q254",
+    "topic": "alt",
+    "q": "A managed futures fund primarily trades:",
+    "options": [
+      "Only physical real estate",
+      "Futures and forward contracts across various asset classes, often using systematic/trend-following models",
+      "Private equity stakes"
+    ],
+    "correct": 1,
+    "explain": "Managed futures funds (CTAs) typically use systematic strategies trading futures across commodities, currencies, rates, and equity indices."
+  },
+  {
+    "id": "q255",
+    "topic": "alt",
+    "q": "The 'J-curve' effect commonly observed in private equity fund returns refers to:",
+    "options": [
+      "Consistently positive returns from day one",
+      "Initial negative or low returns in early years followed by higher returns as investments mature and are exited",
+      "A strategy exclusively used for real estate"
+    ],
+    "correct": 1,
+    "explain": "Private equity funds often show a J-curve: early fees and unrealized investments create low or negative returns before performance improves as exits occur."
+  },
+  {
+    "id": "q256",
+    "topic": "alt",
+    "q": "Compared to direct real estate ownership, investing via a publicly traded REIT offers:",
+    "options": [
+      "Lower liquidity",
+      "Greater liquidity, since REIT shares trade on an exchange",
+      "Identical liquidity"
+    ],
+    "correct": 1,
+    "explain": "REIT shares trade on exchanges like stocks, offering much greater liquidity than owning physical property directly."
+  },
+  {
+    "id": "q257",
+    "topic": "alt",
+    "q": "Which best describes a 'distressed debt' hedge fund strategy?",
+    "options": [
+      "Investing in the debt of financially troubled companies, seeking value through restructuring or recovery",
+      "Only trading investment-grade government bonds",
+      "Avoiding any company facing financial difficulty"
+    ],
+    "correct": 0,
+    "explain": "Distressed debt strategies invest in the bonds or loans of companies in or near financial distress, aiming to profit from restructuring or recovery."
+  },
+  {
+    "id": "q258",
+    "topic": "alt",
+    "q": "Alternative investments are often included in a diversified portfolio primarily to:",
+    "options": [
+      "Increase correlation with traditional equity and bond holdings",
+      "Provide diversification benefits due to lower correlation with traditional asset classes",
+      "Guarantee a fixed return"
+    ],
+    "correct": 1,
+    "explain": "Many alternatives exhibit lower correlation to stocks and bonds, which can improve a portfolio's overall risk-adjusted return through diversification."
+  },
+  {
+    "id": "q259",
+    "topic": "alt",
+    "q": "Which of the following is a common performance benchmark challenge specific to private equity and hedge funds?",
+    "options": [
+      "Standardized, universally agreed-upon benchmarks exist for all strategies",
+      "Self-reported returns and survivorship bias can distort reported performance data",
+      "Performance is always independently audited daily"
+    ],
+    "correct": 1,
+    "explain": "Alternative investment performance data can suffer from self-reporting bias and survivorship bias, since underperforming or failed funds may stop reporting."
+  },
+  {
+    "id": "q260",
+    "topic": "alt",
+    "q": "A global macro hedge fund strategy typically bases its positions on:",
+    "options": [
+      "Company-specific fundamental analysis only",
+      "Broad macroeconomic trends across countries, currencies, interest rates, and commodities",
+      "Fixed, unchanging long-only equity allocations"
+    ],
+    "correct": 1,
+    "explain": "Global macro managers take positions across asset classes and countries based on top-down macroeconomic views."
+  },
+  {
+    "id": "q261",
+    "topic": "alt",
+    "q": "Timberland and farmland are examples of alternative investments valued in part for their:",
+    "options": [
+      "High correlation with technology stocks",
+      "Potential inflation-hedging characteristics and low correlation with traditional assets",
+      "Daily exchange-traded liquidity"
+    ],
+    "correct": 1,
+    "explain": "Natural resource assets like timberland and farmland can offer inflation protection and diversification due to low correlation with stocks and bonds."
+  },
+  {
+    "id": "q262",
+    "topic": "alt",
+    "q": "A private equity 'exit' most commonly occurs through:",
+    "options": [
+      "Holding the investment indefinitely with no plan to sell",
+      "A sale to another company, an IPO, or a secondary sale to another fund",
+      "Converting the investment into a government bond"
+    ],
+    "correct": 1,
+    "explain": "PE funds realize returns through defined exit routes: strategic sale (trade sale), IPO, or secondary buyout by another fund."
+  },
+  {
+    "id": "q263",
+    "topic": "alt",
+    "q": "Compared to traditional long-only equity investing, long/short equity hedge fund strategies allow managers to:",
+    "options": [
+      "Only benefit when markets rise",
+      "Profit from both rising (long) and falling (short) security prices",
+      "Avoid any use of leverage"
+    ],
+    "correct": 1,
+    "explain": "Long/short strategies take long positions in expected outperformers and short positions in expected underperformers, potentially profiting in both directions."
+  },
+  {
+    "id": "q264",
+    "topic": "alt",
+    "q": "Which factor most directly drives the illiquidity premium associated with many alternative investments?",
+    "options": [
+      "Investors demanding extra compensation for tying up capital for extended, uncertain periods",
+      "Central bank policy rates alone",
+      "The size of the management fee only"
+    ],
+    "correct": 0,
+    "explain": "Illiquid investments generally must offer higher expected returns (an illiquidity premium) to compensate investors for restricted access to their capital."
+  },
+  {
+    "id": "q265",
+    "topic": "alt",
+    "q": "Farmland investment returns are typically driven by a combination of:",
+    "options": [
+      "Only capital appreciation, with zero income component",
+      "Both operating income (e.g., crop yields/rents) and land value appreciation",
+      "Interest income only, like a bond"
+    ],
+    "correct": 1,
+    "explain": "Farmland investors typically earn income from farming operations or lease payments plus potential long-term appreciation in land value."
+  },
+  {
+    "id": "q266",
+    "topic": "alt",
+    "q": "A commodity futures-based investment can experience 'negative roll yield' when:",
+    "options": [
+      "The futures curve is in backwardation",
+      "The futures curve is in contango, requiring the investor to buy new contracts at a higher price as old ones expire",
+      "Spot prices never change"
+    ],
+    "correct": 1,
+    "explain": "In contango, longer-dated futures trade above spot, so rolling expiring contracts into new ones at higher prices creates a negative roll yield over time."
+  },
+  {
+    "id": "q267",
+    "topic": "alt",
+    "q": "A key operational due diligence red flag when evaluating an alternative investment manager is:",
+    "options": [
+      "Use of an independent, reputable third-party fund administrator",
+      "Lack of separation between the portfolio manager and the fund's back-office/valuation functions",
+      "Regular third-party audits"
+    ],
+    "correct": 1,
+    "explain": "Insufficient separation of duties between investment decision-making and valuation/back-office functions raises the risk of valuation manipulation or fraud."
+  },
+  {
+    "id": "q268",
+    "topic": "alt",
+    "q": "Compared to publicly traded equity, private equity valuations are typically:",
+    "options": [
+      "Determined continuously by public market prices",
+      "Estimated periodically by the fund manager, introducing valuation lag and smoothing",
+      "Irrelevant, since private equity is never valued until final exit"
+    ],
+    "correct": 1,
+    "explain": "Private equity holdings are valued periodically (e.g., quarterly) by managers using models and comparables, which can smooth reported volatility relative to public markets."
+  },
+  {
+    "id": "q269",
+    "topic": "alt",
+    "q": "An infrastructure fund investing in a toll road is primarily exposed to which risk factor distinct from typical corporate equity?",
+    "options": [
+      "Traffic/usage volume risk tied to a specific physical asset",
+      "Broad diversified market risk only",
+      "No risk, since infrastructure cash flows are contractually guaranteed"
+    ],
+    "correct": 0,
+    "explain": "Infrastructure assets like toll roads depend heavily on usage volumes and regulatory/contractual terms specific to that asset, a distinct risk driver from diversified equity."
+  },
+  {
+    "id": "q270",
+    "topic": "pm",
+    "q": "The main benefit of diversification within a portfolio is that it:",
+    "options": [
+      "Guarantees a positive return",
+      "Eliminates all systematic risk",
+      "Reduces unsystematic, asset-specific risk"
+    ],
+    "correct": 2,
+    "explain": "Diversification reduces idiosyncratic risk; broad market (systematic) risk cannot be diversified away."
+  },
+  {
+    "id": "q271",
+    "topic": "pm",
+    "q": "The Sharpe ratio measures:",
+    "options": [
+      "Return per unit of total risk (standard deviation)",
+      "Return per unit of systematic risk only",
+      "Total return with no adjustment for risk"
+    ],
+    "correct": 0,
+    "explain": "Sharpe ratio = (portfolio return − risk-free rate) ÷ standard deviation of portfolio returns — a total-risk-adjusted measure."
+  },
+  {
+    "id": "q272",
+    "topic": "pm",
+    "q": "The efficient frontier represents the set of portfolios that:",
+    "options": [
+      "Maximize risk for a given level of return",
+      "Offer the highest expected return for each level of risk",
+      "Guarantee no losses"
+    ],
+    "correct": 1,
+    "explain": "The efficient frontier plots portfolios offering the maximum expected return achievable at each level of risk (or minimum risk for each return)."
+  },
+  {
+    "id": "q273",
+    "topic": "pm",
+    "q": "According to modern portfolio theory, an investor's optimal portfolio depends on combining the risk-free asset with:",
+    "options": [
+      "Any randomly chosen risky portfolio",
+      "The tangency (optimal risky) portfolio on the efficient frontier",
+      "Only the single least risky asset available"
+    ],
+    "correct": 1,
+    "explain": "Investors combine the risk-free asset with the tangency portfolio (the risky portfolio offering the best risk-return trade-off) along the capital allocation line."
+  },
+  {
+    "id": "q274",
+    "topic": "pm",
+    "q": "Systematic risk is best described as risk that:",
+    "options": [
+      "Can be diversified away entirely",
+      "Affects the overall market and cannot be diversified away",
+      "Only affects a single company"
+    ],
+    "correct": 1,
+    "explain": "Systematic (market) risk affects broad asset classes or the whole market and cannot be eliminated through diversification."
+  },
+  {
+    "id": "q275",
+    "topic": "pm",
+    "q": "Unsystematic risk is also known as:",
+    "options": [
+      "Market risk",
+      "Diversifiable, firm-specific risk",
+      "Interest rate risk"
+    ],
+    "correct": 1,
+    "explain": "Unsystematic risk is company- or asset-specific and can be reduced or eliminated by holding a diversified portfolio."
+  },
+  {
+    "id": "q276",
+    "topic": "pm",
+    "q": "Under the Capital Asset Pricing Model (CAPM), only which type of risk is compensated with expected return?",
+    "options": [
+      "Total risk",
+      "Unsystematic risk",
+      "Systematic risk (beta)"
+    ],
+    "correct": 2,
+    "explain": "CAPM holds that, since unsystematic risk can be diversified away, only systematic risk (beta) is rewarded with higher expected return."
+  },
+  {
+    "id": "q277",
+    "topic": "pm",
+    "q": "The security market line (SML) plots the relationship between:",
+    "options": [
+      "Expected return and beta",
+      "Expected return and standard deviation",
+      "Price and earnings per share"
+    ],
+    "correct": 0,
+    "explain": "The SML graphs expected return against systematic risk (beta), as implied by the CAPM."
+  },
+  {
+    "id": "q278",
+    "topic": "pm",
+    "q": "A well-constructed Investment Policy Statement (IPS) should primarily define:",
+    "options": [
+      "The exact stocks to buy each week",
+      "The client's objectives, constraints, and overall investment approach",
+      "Only the manager's compensation structure"
+    ],
+    "correct": 1,
+    "explain": "An IPS documents the client's return objectives, risk tolerance, and constraints, forming the foundation for portfolio construction decisions."
+  },
+  {
+    "id": "q279",
+    "topic": "pm",
+    "q": "Strategic asset allocation refers to:",
+    "options": [
+      "Frequent short-term shifts in allocation to exploit market timing",
+      "A long-term target allocation across asset classes based on the investor's objectives and constraints",
+      "Holding only a single asset class"
+    ],
+    "correct": 1,
+    "explain": "Strategic asset allocation sets long-run target weights across asset classes aligned with an investor's goals, risk tolerance, and time horizon."
+  },
+  {
+    "id": "q280",
+    "topic": "pm",
+    "q": "Tactical asset allocation involves:",
+    "options": [
+      "Permanently fixed allocation weights over the investor's life",
+      "Short-term deviations from the strategic allocation to exploit perceived market opportunities",
+      "Ignoring the investor's risk tolerance"
+    ],
+    "correct": 1,
+    "explain": "Tactical asset allocation makes temporary tilts away from the strategic policy weights based on short-to-medium-term market views."
+  },
+  {
+    "id": "q281",
+    "topic": "pm",
+    "q": "Behavioral finance studies:",
+    "options": [
+      "How markets would behave if all investors were perfectly rational",
+      "How psychological biases influence investor and market behavior",
+      "Only macroeconomic policy"
+    ],
+    "correct": 1,
+    "explain": "Behavioral finance examines how cognitive and emotional biases cause investors to deviate from purely rational decision-making assumed in traditional theory."
+  },
+  {
+    "id": "q282",
+    "topic": "pm",
+    "q": "Loss aversion, a key behavioral bias, describes investors':",
+    "options": [
+      "Tendency to feel losses more intensely than equivalent gains",
+      "Preference for high-risk investments",
+      "Complete indifference between gains and losses"
+    ],
+    "correct": 0,
+    "explain": "Loss aversion means investors typically experience the pain of a loss more strongly than the pleasure of an equivalent gain."
+  },
+  {
+    "id": "q283",
+    "topic": "pm",
+    "q": "Overconfidence bias in investing can lead to:",
+    "options": [
+      "Excessive trading and underestimation of risk",
+      "Overly conservative portfolio construction",
+      "Complete avoidance of the stock market"
+    ],
+    "correct": 0,
+    "explain": "Overconfident investors tend to overestimate their knowledge or skill, often leading to excessive trading and underappreciation of risk."
+  },
+  {
+    "id": "q284",
+    "topic": "pm",
+    "q": "A portfolio's Jensen's alpha measures:",
+    "options": [
+      "The portfolio's return in excess of what CAPM would predict, given its beta",
+      "The portfolio's total standard deviation",
+      "The correlation between the portfolio and the market"
+    ],
+    "correct": 0,
+    "explain": "Jensen's alpha is the portfolio's actual return minus its CAPM-expected return, indicating risk-adjusted outperformance or underperformance."
+  },
+  {
+    "id": "q285",
+    "topic": "pm",
+    "q": "A positive Jensen's alpha suggests a portfolio manager has:",
+    "options": [
+      "Underperformed on a risk-adjusted basis",
+      "Outperformed on a risk-adjusted basis, relative to CAPM expectations",
+      "Taken on zero systematic risk"
+    ],
+    "correct": 1,
+    "explain": "A positive alpha indicates returns above what would be expected given the portfolio's level of systematic risk (beta)."
+  },
+  {
+    "id": "q286",
+    "topic": "pm",
+    "q": "The Treynor ratio differs from the Sharpe ratio in that it uses:",
+    "options": [
+      "Beta (systematic risk) rather than total standard deviation in the denominator",
+      "Total assets rather than risk in the denominator",
+      "No risk adjustment at all"
+    ],
+    "correct": 0,
+    "explain": "Treynor ratio = (portfolio return − risk-free rate) / beta, focusing on systematic risk rather than total risk as in the Sharpe ratio."
+  },
+  {
+    "id": "q287",
+    "topic": "pm",
+    "q": "An investor with a long time horizon and high risk tolerance would generally be advised to hold:",
+    "options": [
+      "A larger allocation to lower-risk fixed income",
+      "A larger allocation to growth-oriented assets such as equities",
+      "Only cash and cash equivalents"
+    ],
+    "correct": 1,
+    "explain": "Longer time horizons and higher risk tolerance generally support a greater allocation to higher-expected-return, higher-volatility assets like equities."
+  },
+  {
+    "id": "q288",
+    "topic": "pm",
+    "q": "Rebalancing a portfolio back to its strategic target weights is primarily done to:",
+    "options": [
+      "Chase recent outperforming asset classes",
+      "Maintain the portfolio's intended risk profile as asset values drift over time",
+      "Avoid ever paying transaction costs"
+    ],
+    "correct": 1,
+    "explain": "Rebalancing controls portfolio drift from target weights caused by differing asset class performance, keeping risk exposure aligned with the IPS."
+  },
+  {
+    "id": "q289",
+    "topic": "pm",
+    "q": "A pension fund with long-dated liabilities would generally structure its investment policy around:",
+    "options": [
+      "Extremely short time horizons",
+      "Its long-term liability structure and required funding needs",
+      "Ignoring liabilities entirely"
+    ],
+    "correct": 1,
+    "explain": "Institutional investors like pension funds typically align asset allocation with the timing and size of their future liabilities (liability-driven investing)."
+  },
+  {
+    "id": "q290",
+    "topic": "pm",
+    "q": "Which of the following best describes 'mental accounting,' a behavioral bias?",
+    "options": [
+      "Treating all money as fungible and interchangeable",
+      "Mentally segregating money into separate accounts based on its source or intended use, rather than viewing wealth holistically",
+      "Only occurring among institutional investors"
+    ],
+    "correct": 1,
+    "explain": "Mental accounting leads investors to treat money differently depending on its source or purpose, rather than optimizing the total portfolio holistically."
+  },
+  {
+    "id": "q291",
+    "topic": "pm",
+    "q": "Anchoring bias occurs when an investor:",
+    "options": [
+      "Relies too heavily on an initial piece of information when making subsequent judgments",
+      "Has no reference point for any decision",
+      "Always updates beliefs perfectly with new information"
+    ],
+    "correct": 0,
+    "explain": "Anchoring bias causes investors to fixate on an initial reference point (e.g., a purchase price), skewing subsequent judgments."
+  },
+  {
+    "id": "q292",
+    "topic": "pm",
+    "q": "The information ratio measures:",
+    "options": [
+      "Active return relative to a benchmark, divided by the tracking error",
+      "Total return divided by total risk",
+      "Only the manager's fee level"
+    ],
+    "correct": 0,
+    "explain": "Information ratio = (portfolio return − benchmark return) / tracking error, assessing the consistency of a manager's active outperformance."
+  },
+  {
+    "id": "q293",
+    "topic": "pm",
+    "q": "Tracking error in the context of portfolio management measures:",
+    "options": [
+      "The standard deviation of the difference between portfolio and benchmark returns",
+      "The portfolio's absolute return",
+      "The portfolio's dividend yield"
+    ],
+    "correct": 0,
+    "explain": "Tracking error quantifies how closely a portfolio's returns follow its benchmark, computed as the standard deviation of the excess return series."
+  },
+  {
+    "id": "q294",
+    "topic": "pm",
+    "q": "A core-satellite portfolio approach combines:",
+    "options": [
+      "A passive core holding with actively managed satellite positions around it",
+      "Only passive index funds with no active component",
+      "Only alternative investments"
+    ],
+    "correct": 0,
+    "explain": "Core-satellite investing pairs a low-cost passive core (often broad index exposure) with smaller actively managed satellite positions seeking added value."
+  },
+  {
+    "id": "q295",
+    "topic": "pm",
+    "q": "The risk tolerance of an investor is generally influenced by both:",
+    "options": [
+      "Willingness and ability to take risk",
+      "Only the current market environment",
+      "Only the size of the investor's portfolio"
+    ],
+    "correct": 0,
+    "explain": "Risk tolerance reflects both an investor's psychological willingness to accept risk and their financial ability to bear potential losses."
+  },
+  {
+    "id": "q296",
+    "topic": "pm",
+    "q": "A target-date fund automatically adjusts its asset allocation over time to become:",
+    "options": [
+      "More aggressive as the target date approaches",
+      "More conservative as the target date approaches",
+      "Static and unchanged throughout its life"
+    ],
+    "correct": 1,
+    "explain": "Target-date funds follow a 'glide path,' gradually shifting from growth assets toward more conservative holdings as the target date nears."
+  },
+  {
+    "id": "q297",
+    "topic": "pm",
+    "q": "Which of the following best illustrates confirmation bias?",
+    "options": [
+      "Seeking out information that supports an investor's existing beliefs while ignoring contradictory evidence",
+      "Weighing all available evidence equally",
+      "Changing one's view immediately upon any new data point"
+    ],
+    "correct": 0,
+    "explain": "Confirmation bias leads investors to favor information confirming what they already believe, while discounting disconfirming evidence."
+  },
+  {
+    "id": "q298",
+    "topic": "pm",
+    "q": "The primary goal of performance attribution analysis is to:",
+    "options": [
+      "Determine the sources of a portfolio's returns relative to its benchmark, such as allocation and selection effects",
+      "Calculate a fund's management fee",
+      "Set the fund's initial asset allocation"
+    ],
+    "correct": 0,
+    "explain": "Performance attribution decomposes a portfolio's excess return into components like asset allocation and security selection, explaining sources of performance versus a benchmark."
+  },
+  {
+    "id": "q299",
+    "topic": "pm",
+    "q": "Correlation between two asset classes of exactly +1.0 implies that combining them in a portfolio will:",
+    "options": [
+      "Provide meaningful diversification benefit",
+      "Provide no diversification benefit, since they move perfectly together",
+      "Eliminate all portfolio risk"
+    ],
+    "correct": 1,
+    "explain": "Perfect positive correlation (+1.0) means the two assets move in lockstep, so combining them provides no risk-reduction diversification benefit."
+  }
+];
+
+  /* =========================================================
+     STATE
+  ========================================================= */
+  let history = [];           // [{date, topic, topicName, correct, total}]
+  let questionLog = [];       // [{date, topic, topicName, question, yourAnswer, correctAnswer, result}]
+  let candidateId = null;
+  let currentSet = [];
+  let currentIndex = 0;
+  let currentAnswers = [];    // per-question selected index or null
+  let currentTopicLabel = '';
+
+  const $ = sel => document.querySelector(sel);
+  const el = (tag, cls, html) => { const e=document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e; };
+
+  /* =========================================================
+     PORTABLE STORAGE LAYER
+     Uses Claude's account-tied window.storage when running inside
+     a Claude.ai artifact. Falls back to plain localStorage when
+     this file is hosted or opened anywhere else (GitHub Pages,
+     your own server, opened directly as a local file, etc.), so
+     the exact same file works in both places.
+  ========================================================= */
+  const hasClaudeStorage = (typeof window !== 'undefined') && !!window.storage && typeof window.storage.get === 'function';
+  const STORAGE_MODE = hasClaudeStorage ? 'claude-account' : 'local-browser';
+
+  async function storageGet(key){
+    if(hasClaudeStorage){
+      try{
+        const res = await window.storage.get(key, false);
+        return res ? res.value : null;
+      }catch(e){ return null; }
+    }
+    try{ return window.localStorage.getItem(key); }
+    catch(e){ return null; }
+  }
+
+  async function storageSet(key, value){
+    if(hasClaudeStorage){
+      try{ await window.storage.set(key, value, false); return true; }
+      catch(e){ console.error('storage.set failed', e); return false; }
+    }
+    try{ window.localStorage.setItem(key, value); return true; }
+    catch(e){ console.error('localStorage.setItem failed', e); return false; }
+  }
+
+  /* =========================================================
+     PERSISTENCE
+  ========================================================= */
+  async function loadState(){
+    candidateId = await storageGet('candidate-id');
+    if(!candidateId){
+      candidateId = 'CFA-L1-' + Math.floor(1000 + Math.random()*9000);
+      await storageSet('candidate-id', candidateId);
+    }
+    $('#candidateId').textContent = candidateId;
+
+    try{
+      const raw = await storageGet('session-history');
+      history = raw ? JSON.parse(raw) : [];
+    }catch(e){ history = []; }
+
+    try{
+      const raw = await storageGet('question-log');
+      questionLog = raw ? JSON.parse(raw) : [];
+    }catch(e){ questionLog = []; }
+
+    updateStorageBadge();
+  }
+
+  async function saveHistory(){
+    await storageSet('session-history', JSON.stringify(history));
+  }
+
+  async function saveQuestionLog(){
+    await storageSet('question-log', JSON.stringify(questionLog));
+  }
+
+  function updateStorageBadge(){
+    const badge = $('#storageBadge');
+    if(!badge) return;
+    if(STORAGE_MODE === 'claude-account'){
+      badge.textContent = 'Synced to your Claude account';
+    } else {
+      badge.textContent = 'Saved in this browser only';
+    }
+  }
+
+  /* =========================================================
+     CSV EXPORT
+  ========================================================= */
+  function csvEscape(val){
+    const s = String(val===undefined || val===null ? '' : val);
+    if(/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+    return s;
+  }
+
+  function rowsToCSV(headers, rows){
+    const lines = [headers.map(csvEscape).join(',')];
+    rows.forEach(r=> lines.push(r.map(csvEscape).join(',')));
+    return lines.join('\r\n');
+  }
+
+  function downloadCSV(filename, csvString){
+    const blob = new Blob(['\uFEFF' + csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=> URL.revokeObjectURL(url), 1000);
+  }
+
+  function logEntryToRow(e){
+    return [e.date, e.candidateId||candidateId, e.topicName, e.question, e.yourAnswer, e.correctAnswer, e.result];
+  }
+  const LOG_HEADERS = ['Date','Candidate','Topic','Question','Your Answer','Correct Answer','Result'];
+
+  /* =========================================================
+     STATS
+  ========================================================= */
+  function topicStats(topicId){
+    const rows = history.filter(h=>h.topic===topicId);
+    if(rows.length===0) return null;
+    const correct = rows.reduce((s,r)=>s+r.correct,0);
+    const total = rows.reduce((s,r)=>s+r.total,0);
+    return { pct: Math.round((correct/total)*100), attempts: rows.length };
+  }
+
+  function overallReadiness(){
+    if(history.length===0) return null;
+    const correct = history.reduce((s,r)=>s+r.correct,0);
+    const total = history.reduce((s,r)=>s+r.total,0);
+    if(total===0) return null;
+    return Math.round((correct/total)*100);
+  }
+
+  /* =========================================================
+     RENDER: SIDEBAR
+  ========================================================= */
+  function renderSidebar(){
+    const readiness = overallReadiness();
+    $('#readinessNum').textContent = readiness===null ? '—' : readiness+'%';
+
+    const list = $('#topicList');
+    list.innerHTML = '';
+    TOPICS.forEach(t=>{
+      const stats = topicStats(t.id);
+      const row = el('button','topic-row');
+      row.innerHTML = `
+        <div>
+          <div class="t-name">${t.name}</div>
+          <div class="t-weight">${t.weight}% of exam</div>
+        </div>
+        <div class="t-right">
+          <div class="t-bar-track"><div class="t-bar-fill" style="width:${stats?stats.pct:0}%"></div></div>
+          <div class="t-score ${stats?'':'empty'}">${stats? stats.pct+'%' : '—'}</div>
+        </div>`;
+      row.addEventListener('click', ()=> openSetup(t.id));
+      list.appendChild(row);
+    });
+  }
+
+  /* =========================================================
+     RENDER: DASHBOARD
+  ========================================================= */
+  function renderDashboard(){
+    const grid = $('#topicGrid');
+    grid.innerHTML = '';
+    TOPICS.forEach((t,i)=>{
+      const stats = topicStats(t.id);
+      const qCount = QUESTIONS.filter(q=>q.topic===t.id).length;
+      const barClass = !stats ? '' : stats.pct>=70 ? '' : stats.pct>=45 ? 'mid':'low';
+      const card = el('div','card');
+      card.innerHTML = `
+        <div class="card-top">
+          <span class="card-num">${String(i+1).padStart(2,'0')}</span>
+          <span class="weight-pill">${t.weight}%</span>
+        </div>
+        <h3>${t.name}</h3>
+        <div class="card-bar-track"><div class="card-bar-fill ${barClass}" style="width:${stats?stats.pct:6}%"></div></div>
+        <div class="card-meta">
+          <span>${stats? stats.pct+'% accuracy' : 'not attempted'}</span>
+          <span>${qCount} Qs</span>
+        </div>
+        <button class="card-cta">Practice this topic →</button>
+      `;
+      card.querySelector('.card-cta').addEventListener('click', ()=> openSetup(t.id));
+      grid.appendChild(card);
+    });
+
+    // ledger
+    const wrap = $('#ledgerWrap');
+    if(history.length===0){
+      wrap.innerHTML = `<div class="ledger-empty">No sessions yet — sit your first mock test to start the ledger.</div>`;
+    } else {
+      const rows = [...history].reverse().slice(0,10).map(h=>{
+        const pct = Math.round((h.correct/h.total)*100);
+        const tagClass = pct>=70?'good':pct>=45?'mid':'bad';
+        return `<tr>
+          <td>${h.date}</td>
+          <td>${h.topicName}</td>
+          <td>${h.correct} / ${h.total}</td>
+          <td><span class="score-tag ${tagClass}">${pct}%</span></td>
+        </tr>`;
+      }).join('');
+      wrap.innerHTML = `<table class="ledger-table">
+        <thead><tr><th>Date</th><th>Topic</th><th>Score</th><th>Result</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    }
+
+    const dlBtn = $('#downloadHistoryBtn');
+    dlBtn.disabled = questionLog.length===0;
+    dlBtn.style.opacity = questionLog.length===0 ? 0.45 : 1;
+    dlBtn.style.cursor = questionLog.length===0 ? 'default' : 'pointer';
+  }
+
+  /* =========================================================
+     QUIZ FLOW
+  ========================================================= */
+  function shuffled(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+
+  let pendingTopicId = null; // topic chosen in setup, before count is picked
+  let pendingCount = null;
+
+  function openSetup(topicId){
+    pendingTopicId = topicId;
+    const pool = topicId ? QUESTIONS.filter(q=>q.topic===topicId) : QUESTIONS;
+    const label = topicId ? TOPICS.find(t=>t.id===topicId).name : 'Full Mixed Mock';
+    const max = pool.length;
+
+    $('#setupTitle').textContent = label;
+    $('#setupSub').textContent = `Randomly drawn from ${max} questions in the bank — a fresh mix every time you sit this mock.`;
+
+    const options = topicId
+      ? [10,20,max].filter((v,i,a)=>a.indexOf(v)===i && v<=max)
+      : [10,25,50,100,max].filter((v,i,a)=>a.indexOf(v)===i && v<=max);
+
+    pendingCount = options[0];
+    const wrap = $('#countOptions');
+    wrap.innerHTML = '';
+    options.forEach(n=>{
+      const pill = el('div','count-pill' + (n===pendingCount?' selected':''));
+      pill.innerHTML = `${n}<span class="cp-sub">${n===max?'full set':'questions'}</span>`;
+      pill.addEventListener('click', ()=>{
+        pendingCount = n;
+        wrap.querySelectorAll('.count-pill').forEach(p=>p.classList.remove('selected'));
+        pill.classList.add('selected');
+      });
+      wrap.appendChild(pill);
+    });
+
+    showView('setup');
+  }
+
+  $('#beginMockBtn').addEventListener('click', ()=> startQuiz(pendingTopicId, pendingCount));
+  $('#setupBackBtn').addEventListener('click', ()=>{ renderDashboard(); showView('dashboard'); });
+
+  function startQuiz(topicId, count){
+    let pool, label;
+    if(topicId){
+      pool = QUESTIONS.filter(q=>q.topic===topicId);
+      label = TOPICS.find(t=>t.id===topicId).name;
+    } else {
+      pool = QUESTIONS;
+      label = 'Full Mixed Mock';
+    }
+    const n = count && count>0 ? Math.min(count, pool.length) : pool.length;
+    currentSet = shuffled(pool).slice(0, n);
+    currentTopicLabel = label;
+    currentIndex = 0;
+    currentAnswers = new Array(currentSet.length).fill(null);
+    showView('quiz');
+    renderQuizDots();
+    renderQuestion();
+  }
+
+  function renderQuizDots(){
+    const dots = $('#quizDots');
+    dots.innerHTML = '';
+    currentSet.forEach((q,i)=>{
+      const d = el('div','dot');
+      if(i===currentIndex) d.classList.add('current');
+      const ans = currentAnswers[i];
+      if(ans!==null){
+        d.classList.add(ans===q.correct ? 'answered-correct':'answered-wrong');
+      }
+      dots.appendChild(d);
+    });
+  }
+
+  function renderQuestion(){
+    const q = currentSet[currentIndex];
+    $('#quizTopicTag').textContent = currentTopicLabel;
+    $('#quizCount').textContent = `Question ${currentIndex+1} of ${currentSet.length}`;
+    $('#qNumber').textContent = 'Q ' + String(currentIndex+1).padStart(2,'0');
+    $('#qText').textContent = q.q;
+
+    const optWrap = $('#qOptions');
+    optWrap.innerHTML = '';
+    const letters = ['A','B','C'];
+    q.options.forEach((optText,i)=>{
+      const opt = el('button','option');
+      opt.innerHTML = `<span class="bubble">${letters[i]}</span><span>${optText}</span><span class="mark"></span>`;
+      opt.addEventListener('click', ()=> selectAnswer(i));
+      optWrap.appendChild(opt);
+    });
+
+    $('#verdictArea').innerHTML = '';
+    $('#nextBtn').classList.add('hidden');
+
+    // if already answered (navigated back via dots not supported currently, but keep safe)
+    if(currentAnswers[currentIndex]!==null){
+      revealAnswer(currentAnswers[currentIndex], true);
+    }
+    renderQuizDots();
+  }
+
+  function selectAnswer(i){
+    if(currentAnswers[currentIndex]!==null) return; // already locked
+    currentAnswers[currentIndex] = i;
+    revealAnswer(i, false);
+  }
+
+  function revealAnswer(selectedIndex, silent){
+    const q = currentSet[currentIndex];
+    const options = document.querySelectorAll('#qOptions .option');
+    options.forEach((opt,i)=>{
+      opt.classList.add('locked');
+      const markEl = opt.querySelector('.mark');
+      if(i===q.correct){
+        opt.classList.add('correct-reveal');
+        markEl.textContent = '✓';
+      }
+      if(i===selectedIndex && selectedIndex!==q.correct){
+        opt.classList.add('wrong-reveal');
+        markEl.textContent = '✗';
+      }
+      if(i===selectedIndex && selectedIndex===q.correct){
+        markEl.textContent = '✓';
+      }
+    });
+
+    const isCorrect = selectedIndex===q.correct;
+    const verdict = $('#verdictArea');
+    verdict.innerHTML = `
+      <div class="verdict-row">
+        <span class="stamp ${isCorrect?'correct':'wrong'}">${isCorrect?'Correct':'Incorrect'}</span>
+      </div>
+      <div class="explain-box">
+        <div class="explain-label">Grader's Note</div>
+        <div class="explain-text">${q.explain}</div>
+      </div>
+    `;
+
+    const isLast = currentIndex === currentSet.length-1;
+    const nextBtn = $('#nextBtn');
+    nextBtn.textContent = isLast ? 'Finish & See Results →' : 'Next Question →';
+    nextBtn.classList.remove('hidden');
+    renderQuizDots();
+  }
+
+  $('#nextBtn').addEventListener('click', ()=>{
+    if(currentIndex < currentSet.length-1){
+      currentIndex++;
+      renderQuestion();
+    } else {
+      finishQuiz();
+    }
+  });
+
+  let lastSetLogEntries = []; // detailed rows for the most recently completed set
+
+  function topicNameById(id){
+    const t = TOPICS.find(t=>t.id===id);
+    return t ? t.name : 'Mixed';
+  }
+
+  async function finishQuiz(){
+    const correctCount = currentAnswers.reduce((s,a,i)=> s + (a===currentSet[i].correct?1:0), 0);
+    const topicIdGuess = currentSet.every(q=>q.topic===currentSet[0].topic) ? currentSet[0].topic : null;
+    const today = new Date().toISOString().slice(0,10);
+
+    const entry = {
+      date: today,
+      topic: topicIdGuess || 'mixed',
+      topicName: currentTopicLabel,
+      correct: correctCount,
+      total: currentSet.length
+    };
+    history.push(entry);
+    await saveHistory();
+
+    lastSetLogEntries = currentSet.map((q,i)=>{
+      const ansIdx = currentAnswers[i];
+      return {
+        date: today,
+        candidateId: candidateId,
+        topic: q.topic,
+        topicName: topicNameById(q.topic),
+        question: q.q,
+        yourAnswer: q.options[ansIdx],
+        correctAnswer: q.options[q.correct],
+        result: ansIdx===q.correct ? 'Correct' : 'Incorrect'
+      };
+    });
+    questionLog.push(...lastSetLogEntries);
+    await saveQuestionLog();
+
+    renderSidebar();
+    renderResults(correctCount);
+  }
+
+  function renderResults(correctCount){
+    showView('results');
+    const total = currentSet.length;
+    const pct = Math.round((correctCount/total)*100);
+    $('#resultsScore').textContent = `${correctCount}/${total}`;
+    $('#resultsMsg').innerHTML = `<b>${currentTopicLabel}</b> — ${pct}% correct. ${
+      pct>=80 ? 'Charter-track form. Keep this pace.' :
+      pct>=60 ? 'Solid, but a few gaps worth revisiting below.' :
+      'Worth another pass — review the notes below before retaking.'
+    }`;
+
+    const list = $('#reviewList');
+    list.innerHTML = '';
+    currentSet.forEach((q,i)=>{
+      const ans = currentAnswers[i];
+      const ok = ans===q.correct;
+      const item = el('div','review-item');
+      item.innerHTML = `
+        <div class="review-icon ${ok?'ok':'no'}">${ok?'✓':'✗'}</div>
+        <div class="review-body">
+          <div class="rq">${q.q}</div>
+          <div class="ra">Your answer: ${q.options[ans]}${ok?'':' · Correct: '+q.options[q.correct]}</div>
+        </div>`;
+      list.appendChild(item);
+    });
+  }
+
+  $('#resultsBackBtn').addEventListener('click', ()=>{ renderDashboard(); showView('dashboard'); });
+  $('#resultsRetakeBtn').addEventListener('click', ()=>{
+    const topicIdGuess = currentSet.every(q=>q.topic===currentSet[0].topic) ? currentSet[0].topic : null;
+    startQuiz(topicIdGuess, currentSet.length); // same length, freshly re-randomized
+  });
+  $('#backBtn').addEventListener('click', ()=>{ renderDashboard(); showView('dashboard'); });
+  $('#startFullMock').addEventListener('click', ()=> openSetup(null));
+
+  $('#downloadSetBtn').addEventListener('click', ()=>{
+    if(lastSetLogEntries.length===0) return;
+    const csv = rowsToCSV(LOG_HEADERS, lastSetLogEntries.map(logEntryToRow));
+    const stamp = lastSetLogEntries[0].date;
+    downloadCSV(`cfa-mock-${slugify(currentTopicLabel)}-${stamp}.csv`, csv);
+  });
+
+  $('#downloadHistoryBtn').addEventListener('click', ()=>{
+    if(questionLog.length===0) return;
+    const csv = rowsToCSV(LOG_HEADERS, questionLog.map(logEntryToRow));
+    downloadCSV(`cfa-mock-full-history-${candidateId}.csv`, csv);
+  });
+
+  function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+
+  function showView(name){
+    $('#view-dashboard').classList.toggle('hidden', name!=='dashboard');
+    $('#view-setup').classList.toggle('hidden', name!=='setup');
+    $('#view-quiz').classList.toggle('hidden', name!=='quiz');
+    $('#view-results').classList.toggle('hidden', name!=='results');
+  }
+
+  /* =========================================================
+     INIT
+  ========================================================= */
+  async function init(){
+    await loadState();
+    renderSidebar();
+    renderDashboard();
+    showView('dashboard');
+  }
+  init();
+
+})();
+</script>
+</body>
+</html>
