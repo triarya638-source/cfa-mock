@@ -122,6 +122,39 @@
     color: rgba(255,255,255,0.55);
   }
 
+  .alias-box{
+    border-top:1px solid rgba(255,255,255,0.14);
+    border-bottom:1px solid rgba(255,255,255,0.14);
+    padding: 12px 0 14px;
+  }
+  .alias-row{
+    display:flex; gap:6px;
+  }
+  .alias-input{
+    flex:1;
+    min-width:0;
+    background: rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius: var(--radius);
+    color:#fff;
+    font-family: var(--sans);
+    font-size:12.5px;
+    padding:8px 10px;
+  }
+  .alias-input::placeholder{ color: rgba(255,255,255,0.35); }
+  .alias-input:focus{ outline:none; border-color: var(--gold); }
+  .alias-hint{
+    font-family:var(--mono);
+    font-size:9.5px;
+    line-height:1.5;
+    color: rgba(255,255,255,0.42);
+    margin-top:8px;
+  }
+  .alias-hint a{
+    color: var(--gold-light);
+    cursor:pointer;
+    text-decoration: underline;
+  }
   .nav-title{
     font-family:var(--mono);
     font-size:10px;
@@ -421,6 +454,44 @@
     font-size:12px;
     color: var(--slate-soft);
   }
+  .quiz-total-box{
+    text-align:right;
+    font-family:var(--mono);
+  }
+  .quiz-total-num{
+    font-size:20px;
+    font-weight:600;
+    color: var(--ink);
+    line-height:1;
+  }
+  .quiz-total-lbl{
+    font-size:9.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color: var(--slate-soft);
+    margin-top:2px;
+  }
+
+  .progress-track{
+    height:7px;
+    border-radius:4px;
+    background: var(--paper-2);
+    overflow:hidden;
+    margin-bottom:6px;
+  }
+  .progress-fill{
+    height:100%;
+    background: var(--gold);
+    border-radius:4px;
+    transition: width .25s ease;
+  }
+  .progress-caption{
+    font-family:var(--mono);
+    font-size:10.5px;
+    color: var(--slate-soft);
+    margin-bottom:16px;
+  }
+
   .dots{
     display:flex; gap:6px; flex-wrap:wrap; margin-bottom:26px;
   }
@@ -428,10 +499,23 @@
     width:9px; height:9px; border-radius:50%;
     background: var(--paper-2);
     border:1px solid var(--line);
+    cursor:pointer;
+    position:relative;
+    transition: transform .1s ease;
   }
+  .dot:hover{ transform: scale(1.4); }
   .dot.answered-correct{ background: var(--green); border-color: var(--green); }
   .dot.answered-wrong{ background: var(--red); border-color: var(--red); }
   .dot.current{ box-shadow: 0 0 0 3px rgba(183,137,61,0.28); border-color: var(--gold); }
+  .dot.flagged::after{
+    content:"";
+    position:absolute;
+    top:-4px; right:-4px;
+    width:5px; height:5px;
+    border-radius:50%;
+    background: var(--gold);
+    border:1px solid #fff;
+  }
 
   .exam-paper{
     background:#fff;
@@ -451,12 +535,33 @@
     background: var(--gold);
     border-radius: var(--radius) 0 0 var(--radius);
   }
+  .q-topline{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:10px; gap:10px; flex-wrap:wrap;
+  }
   .q-number{
     font-family:var(--mono);
     font-size:12px;
     color: var(--slate-soft);
-    margin-bottom:10px;
   }
+  .flag-btn{
+    font-family:var(--mono);
+    font-size:11px;
+    color: var(--slate-soft);
+    background: transparent;
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:5px 12px;
+    cursor:pointer;
+    display:flex; align-items:center; gap:5px;
+  }
+  .flag-btn:hover{ border-color: var(--gold); color: var(--gold); }
+  .flag-btn.flagged{
+    background: var(--gold);
+    border-color: var(--gold);
+    color:#fff;
+  }
+  .flag-icon{ font-size:12px; }
   .q-text{
     font-family: var(--serif);
     font-size:20px;
@@ -578,7 +683,7 @@
   }
 
   .quiz-footer{
-    display:flex; justify-content:flex-end; margin-top:22px;
+    display:flex; justify-content:space-between; margin-top:22px; gap:10px;
   }
 
   /* results */
@@ -613,6 +718,29 @@
     line-height:1.4;
   }
   .review-list{ display:flex; flex-direction:column; gap:8px; }
+  .flag-summary{
+    font-family:var(--mono);
+    font-size:12px;
+    color: var(--gold);
+    background:#FBF3E4;
+    border:1px solid rgba(183,137,61,0.35);
+    border-radius: var(--radius);
+    padding:9px 14px;
+    margin-bottom:12px;
+  }
+  .log-filter-row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin-bottom:12px; flex-wrap:wrap;
+  }
+  .log-select{
+    font-family:var(--sans);
+    font-size:12.5px;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    background:#fff;
+    color: var(--slate);
+  }
   .review-item{
     display:flex; align-items:flex-start; gap:12px;
     padding:12px 14px;
@@ -692,12 +820,22 @@
       </div>
     </div>
 
+    <div class="alias-box">
+      <div class="nav-title" style="margin-bottom:2px;">Access By Alias</div>
+      <div class="alias-row">
+        <input type="text" id="aliasInput" class="alias-input" placeholder="type an alias…" maxlength="40" />
+        <button class="btn btn-gold btn-small-mono" id="aliasLoadBtn">Load</button>
+      </div>
+      <div class="alias-hint" id="aliasHint">—</div>
+    </div>
+
     <div>
       <div class="nav-title">Topic Areas</div>
       <div class="topic-list" id="topicList"></div>
     </div>
 
     <button class="btn btn-gold btn-block" id="startFullMock">Start Full Mock Exam →</button>
+    <button class="btn btn-ghost-dark btn-block" id="viewLogBtn" style="margin-top:-10px;">View Saved Logs →</button>
     <button class="btn btn-ghost-dark btn-block" id="backBtn" style="margin-top:-10px;">← Back to dashboard</button>
 
     <div class="sidebar-footer">
@@ -751,11 +889,26 @@
           <div class="quiz-topic-tag" id="quizTopicTag">Topic</div>
           <div class="quiz-count" id="quizCount">Question 1 of 10</div>
         </div>
+        <div class="quiz-total-box">
+          <div class="quiz-total-num" id="quizTotalNum">10</div>
+          <div class="quiz-total-lbl">total questions</div>
+        </div>
       </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <div class="progress-caption" id="progressCaption">0 of 10 answered</div>
+
       <div class="dots" id="quizDots"></div>
 
       <div class="exam-paper">
-        <div class="q-number" id="qNumber">Q 01</div>
+        <div class="q-topline">
+          <div class="q-number" id="qNumber">Q 01</div>
+          <button class="flag-btn" id="flagBtn" title="Flag this question for review">
+            <span class="flag-icon">⚑</span> <span id="flagBtnLabel">Flag for review</span>
+          </button>
+        </div>
         <p class="q-text" id="qText">Question text</p>
         <div class="options" id="qOptions"></div>
 
@@ -763,6 +916,7 @@
       </div>
 
       <div class="quiz-footer">
+        <button class="btn btn-ghost" id="prevBtn">← Previous</button>
         <button class="btn btn-gold hidden" id="nextBtn">Next Question →</button>
       </div>
     </section>
@@ -781,6 +935,7 @@
       </div>
 
       <div class="section-label">Review</div>
+      <div class="flag-summary hidden" id="flagSummary"></div>
       <div class="review-list" id="reviewList"></div>
 
       <div class="results-actions">
@@ -788,6 +943,32 @@
         <button class="btn btn-ghost" id="resultsRetakeBtn">Retake This Set</button>
         <button class="btn btn-ghost" id="downloadSetBtn">⬇ Download This Set (CSV)</button>
       </div>
+    </section>
+
+    <!-- SAVED LOGS VIEW -->
+    <section id="view-log" class="hidden">
+      <div class="top-row">
+        <div>
+          <div class="eyebrow">Full Archive</div>
+          <h1 class="page-title">Saved Progress Logs</h1>
+          <p class="page-sub">Every mock you've sat, and every individual question you've answered, right/wrong.</p>
+        </div>
+        <button class="btn btn-ghost" id="logBackBtn">← Back to dashboard</button>
+      </div>
+
+      <div class="section-label">All Sessions (<span id="logSessionCount">0</span>)</div>
+      <div id="logSessionsWrap"></div>
+
+      <div class="section-label" style="margin-top:32px;">
+        Question-Level Log (<span id="logQuestionCount">0</span>)
+      </div>
+      <div class="log-filter-row">
+        <select id="logTopicFilter" class="log-select">
+          <option value="">All topics</option>
+        </select>
+        <button class="btn btn-ghost btn-small-mono" id="downloadHistoryBtn2">⬇ Download Full History (CSV)</button>
+      </div>
+      <div id="logQuestionsWrap"></div>
     </section>
 
   </main>
@@ -4420,10 +4601,12 @@
   ========================================================= */
   let history = [];           // [{date, topic, topicName, correct, total}]
   let questionLog = [];       // [{date, topic, topicName, question, yourAnswer, correctAnswer, result}]
-  let candidateId = null;
+  let candidateId = null;     // anonymous fallback identity (no alias set)
+  let alias = null;           // active alias, or null if browsing anonymously
   let currentSet = [];
   let currentIndex = 0;
   let currentAnswers = [];    // per-question selected index or null
+  let currentFlags = [];      // per-question boolean, flagged for review
   let currentTopicLabel = '';
 
   const $ = sel => document.querySelector(sel);
@@ -4436,14 +4619,22 @@
      this file is hosted or opened anywhere else (GitHub Pages,
      your own server, opened directly as a local file, etc.), so
      the exact same file works in both places.
+
+     Alias data is stored as SHARED storage (shared=true) when running
+     inside Claude.ai, which is what makes typing the same alias on a
+     different device/account pull the same data — but it also means
+     anyone who knows/guesses that alias can read or overwrite it. In
+     standalone (localStorage) mode there is no real cross-device
+     sharing possible without a backend, so aliasing there only gives
+     you separate named profiles within the same browser.
   ========================================================= */
   const hasClaudeStorage = (typeof window !== 'undefined') && !!window.storage && typeof window.storage.get === 'function';
   const STORAGE_MODE = hasClaudeStorage ? 'claude-account' : 'local-browser';
 
-  async function storageGet(key){
+  async function storageGet(key, shared){
     if(hasClaudeStorage){
       try{
-        const res = await window.storage.get(key, false);
+        const res = await window.storage.get(key, !!shared);
         return res ? res.value : null;
       }catch(e){ return null; }
     }
@@ -4451,45 +4642,137 @@
     catch(e){ return null; }
   }
 
-  async function storageSet(key, value){
+  async function storageSet(key, value, shared){
     if(hasClaudeStorage){
-      try{ await window.storage.set(key, value, false); return true; }
+      try{ await window.storage.set(key, value, !!shared); return true; }
       catch(e){ console.error('storage.set failed', e); return false; }
     }
     try{ window.localStorage.setItem(key, value); return true; }
     catch(e){ console.error('localStorage.setItem failed', e); return false; }
   }
 
+  async function storageDelete(key, shared){
+    if(hasClaudeStorage){
+      try{ await window.storage.delete(key, !!shared); }catch(e){}
+    } else {
+      try{ window.localStorage.removeItem(key); }catch(e){}
+    }
+  }
+
+  function sanitizeAlias(raw){
+    return (raw || '')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g,'-')
+      .replace(/-+/g,'-')
+      .replace(/^-+|-+$/g,'')
+      .slice(0,40);
+  }
+
   /* =========================================================
      PERSISTENCE
   ========================================================= */
   async function loadState(){
-    candidateId = await storageGet('candidate-id');
-    if(!candidateId){
-      candidateId = 'CFA-L1-' + Math.floor(1000 + Math.random()*9000);
-      await storageSet('candidate-id', candidateId);
+    const remembered = await storageGet('remembered-alias', false);
+    if(remembered){
+      alias = remembered;
+      await loadAliasData(alias);
+    } else {
+      await loadAnonymousData();
     }
-    $('#candidateId').textContent = candidateId;
-
-    try{
-      const raw = await storageGet('session-history');
-      history = raw ? JSON.parse(raw) : [];
-    }catch(e){ history = []; }
-
-    try{
-      const raw = await storageGet('question-log');
-      questionLog = raw ? JSON.parse(raw) : [];
-    }catch(e){ questionLog = []; }
-
+    updateIdentityUI();
     updateStorageBadge();
   }
 
+  async function loadAnonymousData(){
+    alias = null;
+    candidateId = await storageGet('candidate-id', false);
+    if(!candidateId){
+      candidateId = 'CFA-L1-' + Math.floor(1000 + Math.random()*9000);
+      await storageSet('candidate-id', candidateId, false);
+    }
+    try{
+      const raw = await storageGet('session-history', false);
+      history = raw ? JSON.parse(raw) : [];
+    }catch(e){ history = []; }
+    try{
+      const raw = await storageGet('question-log', false);
+      questionLog = raw ? JSON.parse(raw) : [];
+    }catch(e){ questionLog = []; }
+  }
+
+  async function loadAliasData(a){
+    try{
+      const raw = await storageGet(`alias:${a}:session-history`, true);
+      history = raw ? JSON.parse(raw) : [];
+    }catch(e){ history = []; }
+    try{
+      const raw = await storageGet(`alias:${a}:question-log`, true);
+      questionLog = raw ? JSON.parse(raw) : [];
+    }catch(e){ questionLog = []; }
+  }
+
+  async function switchToAlias(rawAlias){
+    const a = sanitizeAlias(rawAlias);
+    if(!a) return;
+    alias = a;
+    await storageSet('remembered-alias', alias, false);
+    await loadAliasData(alias);
+    updateIdentityUI();
+    updateAliasHint();
+    renderSidebar();
+    renderDashboard();
+  }
+
+  async function clearAlias(){
+    alias = null;
+    await storageDelete('remembered-alias', false);
+    await loadAnonymousData();
+    updateIdentityUI();
+    updateAliasHint();
+    renderSidebar();
+    renderDashboard();
+  }
+
+  function updateIdentityUI(){
+    $('#candidateId').textContent = alias ? alias : candidateId;
+    const input = $('#aliasInput');
+    if(input) input.value = alias || '';
+    updateAliasHint();
+  }
+
+  function updateAliasHint(){
+    const hint = $('#aliasHint');
+    if(!hint) return;
+    if(alias){
+      if(STORAGE_MODE === 'claude-account'){
+        hint.innerHTML = `Alias <b>${alias}</b> active — this uses <b>shared</b> storage, so anyone who types this same alias, on any device, can view or overwrite this data. Don't use anything private. <a id="aliasClearLink">Switch to private/anonymous</a>`;
+      } else {
+        hint.innerHTML = `Alias <b>${alias}</b> active — saved in this browser only. Aliasing here just keeps separate profiles on this device; it won't sync elsewhere without a backend. <a id="aliasClearLink">Switch to private/anonymous</a>`;
+      }
+    } else {
+      hint.textContent = STORAGE_MODE === 'claude-account'
+        ? 'No alias set — progress is private to your Claude account only.'
+        : 'No alias set — progress saved in this browser only.';
+    }
+    const clearLink = $('#aliasClearLink');
+    if(clearLink) clearLink.addEventListener('click', clearAlias);
+  }
+
   async function saveHistory(){
-    await storageSet('session-history', JSON.stringify(history));
+    if(alias){
+      await storageSet(`alias:${alias}:session-history`, JSON.stringify(history), true);
+    } else {
+      await storageSet('session-history', JSON.stringify(history), false);
+    }
   }
 
   async function saveQuestionLog(){
-    await storageSet('question-log', JSON.stringify(questionLog));
+    if(alias){
+      await storageSet(`alias:${alias}:question-log`, JSON.stringify(questionLog), true);
+    } else {
+      await storageSet('question-log', JSON.stringify(questionLog), false);
+    }
   }
 
   function updateStorageBadge(){
@@ -4530,9 +4813,9 @@
   }
 
   function logEntryToRow(e){
-    return [e.date, e.candidateId||candidateId, e.topicName, e.question, e.yourAnswer, e.correctAnswer, e.result];
+    return [e.date, e.candidateId||alias||candidateId, e.topicName, e.question, e.yourAnswer, e.correctAnswer, e.result, e.flagged ? 'Yes' : ''];
   }
-  const LOG_HEADERS = ['Date','Candidate','Topic','Question','Your Answer','Correct Answer','Result'];
+  const LOG_HEADERS = ['Date','Candidate','Topic','Question','Your Answer','Correct Answer','Result','Flagged'];
 
   /* =========================================================
      STATS
@@ -4689,7 +4972,9 @@
     currentTopicLabel = label;
     currentIndex = 0;
     currentAnswers = new Array(currentSet.length).fill(null);
+    currentFlags = new Array(currentSet.length).fill(false);
     showView('quiz');
+    $('#quizTotalNum').textContent = currentSet.length;
     renderQuizDots();
     renderQuestion();
   }
@@ -4704,8 +4989,23 @@
       if(ans!==null){
         d.classList.add(ans===q.correct ? 'answered-correct':'answered-wrong');
       }
+      if(currentFlags[i]) d.classList.add('flagged');
+      d.title = `Question ${i+1}${currentFlags[i]?' (flagged)':''}`;
+      d.addEventListener('click', ()=>{
+        currentIndex = i;
+        renderQuestion();
+      });
       dots.appendChild(d);
     });
+    updateProgressBar();
+  }
+
+  function updateProgressBar(){
+    const answered = currentAnswers.filter(a=>a!==null).length;
+    const total = currentSet.length;
+    const pct = total>0 ? Math.round((answered/total)*100) : 0;
+    $('#progressFill').style.width = pct+'%';
+    $('#progressCaption').textContent = `${answered} of ${total} answered`;
   }
 
   function renderQuestion(){
@@ -4728,12 +5028,38 @@
     $('#verdictArea').innerHTML = '';
     $('#nextBtn').classList.add('hidden');
 
-    // if already answered (navigated back via dots not supported currently, but keep safe)
+    $('#prevBtn').disabled = currentIndex===0;
+    $('#prevBtn').style.opacity = currentIndex===0 ? 0.4 : 1;
+
+    updateFlagButton();
+
+    // if already answered (navigating via dots/back), re-reveal that state
     if(currentAnswers[currentIndex]!==null){
       revealAnswer(currentAnswers[currentIndex], true);
     }
     renderQuizDots();
   }
+
+  function updateFlagButton(){
+    const btn = $('#flagBtn');
+    const label = $('#flagBtnLabel');
+    const flagged = !!currentFlags[currentIndex];
+    btn.classList.toggle('flagged', flagged);
+    label.textContent = flagged ? 'Flagged' : 'Flag for review';
+  }
+
+  $('#flagBtn').addEventListener('click', ()=>{
+    currentFlags[currentIndex] = !currentFlags[currentIndex];
+    updateFlagButton();
+    renderQuizDots();
+  });
+
+  $('#prevBtn').addEventListener('click', ()=>{
+    if(currentIndex>0){
+      currentIndex--;
+      renderQuestion();
+    }
+  });
 
   function selectAnswer(i){
     if(currentAnswers[currentIndex]!==null) return; // already locked
@@ -4814,13 +5140,14 @@
       const ansIdx = currentAnswers[i];
       return {
         date: today,
-        candidateId: candidateId,
+        candidateId: alias || candidateId,
         topic: q.topic,
         topicName: topicNameById(q.topic),
         question: q.q,
         yourAnswer: q.options[ansIdx],
         correctAnswer: q.options[q.correct],
-        result: ansIdx===q.correct ? 'Correct' : 'Incorrect'
+        result: ansIdx===q.correct ? 'Correct' : 'Incorrect',
+        flagged: !!currentFlags[i]
       };
     });
     questionLog.push(...lastSetLogEntries);
@@ -4841,16 +5168,26 @@
       'Worth another pass — review the notes below before retaking.'
     }`;
 
+    const flagCount = currentFlags.filter(Boolean).length;
+    const flagBanner = $('#flagSummary');
+    if(flagCount>0){
+      flagBanner.classList.remove('hidden');
+      flagBanner.innerHTML = `⚑ You flagged ${flagCount} question${flagCount===1?'':'s'} for review — marked below.`;
+    } else {
+      flagBanner.classList.add('hidden');
+    }
+
     const list = $('#reviewList');
     list.innerHTML = '';
     currentSet.forEach((q,i)=>{
       const ans = currentAnswers[i];
       const ok = ans===q.correct;
+      const flagged = !!currentFlags[i];
       const item = el('div','review-item');
       item.innerHTML = `
         <div class="review-icon ${ok?'ok':'no'}">${ok?'✓':'✗'}</div>
         <div class="review-body">
-          <div class="rq">${q.q}</div>
+          <div class="rq">${flagged?'⚑ ':''}${q.q}</div>
           <div class="ra">Your answer: ${q.options[ans]}${ok?'':' · Correct: '+q.options[q.correct]}</div>
         </div>`;
       list.appendChild(item);
@@ -4865,6 +5202,20 @@
   $('#backBtn').addEventListener('click', ()=>{ renderDashboard(); showView('dashboard'); });
   $('#startFullMock').addEventListener('click', ()=> openSetup(null));
 
+  $('#aliasLoadBtn').addEventListener('click', ()=>{
+    const v = $('#aliasInput').value;
+    if(v && sanitizeAlias(v)) switchToAlias(v);
+  });
+  $('#aliasInput').addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){
+      const v = $('#aliasInput').value;
+      if(v && sanitizeAlias(v)) switchToAlias(v);
+    }
+  });
+
+  $('#viewLogBtn').addEventListener('click', ()=>{ renderLogView(); showView('log'); });
+  $('#logBackBtn').addEventListener('click', ()=>{ renderDashboard(); showView('dashboard'); });
+
   $('#downloadSetBtn').addEventListener('click', ()=>{
     if(lastSetLogEntries.length===0) return;
     const csv = rowsToCSV(LOG_HEADERS, lastSetLogEntries.map(logEntryToRow));
@@ -4872,11 +5223,13 @@
     downloadCSV(`cfa-mock-${slugify(currentTopicLabel)}-${stamp}.csv`, csv);
   });
 
-  $('#downloadHistoryBtn').addEventListener('click', ()=>{
+  function downloadFullHistory(){
     if(questionLog.length===0) return;
     const csv = rowsToCSV(LOG_HEADERS, questionLog.map(logEntryToRow));
-    downloadCSV(`cfa-mock-full-history-${candidateId}.csv`, csv);
-  });
+    downloadCSV(`cfa-mock-full-history-${alias || candidateId}.csv`, csv);
+  }
+  $('#downloadHistoryBtn').addEventListener('click', downloadFullHistory);
+  $('#downloadHistoryBtn2').addEventListener('click', downloadFullHistory);
 
   function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 
@@ -4885,6 +5238,70 @@
     $('#view-setup').classList.toggle('hidden', name!=='setup');
     $('#view-quiz').classList.toggle('hidden', name!=='quiz');
     $('#view-results').classList.toggle('hidden', name!=='results');
+    $('#view-log').classList.toggle('hidden', name!=='log');
+  }
+
+  /* =========================================================
+     SAVED LOGS VIEW
+  ========================================================= */
+  function renderLogView(){
+    $('#logSessionCount').textContent = history.length;
+    $('#logQuestionCount').textContent = questionLog.length;
+
+    const sessWrap = $('#logSessionsWrap');
+    if(history.length===0){
+      sessWrap.innerHTML = `<div class="ledger-empty">No sessions saved yet.</div>`;
+    } else {
+      const rows = [...history].reverse().map(h=>{
+        const pct = Math.round((h.correct/h.total)*100);
+        const tagClass = pct>=70?'good':pct>=45?'mid':'bad';
+        return `<tr>
+          <td>${h.date}</td>
+          <td>${h.topicName}</td>
+          <td>${h.correct} / ${h.total}</td>
+          <td><span class="score-tag ${tagClass}">${pct}%</span></td>
+        </tr>`;
+      }).join('');
+      sessWrap.innerHTML = `<table class="ledger-table">
+        <thead><tr><th>Date</th><th>Topic</th><th>Score</th><th>Result</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    }
+
+    const filterSel = $('#logTopicFilter');
+    if(filterSel.options.length<=1){
+      TOPICS.forEach(t=>{
+        const opt = document.createElement('option');
+        opt.value = t.id; opt.textContent = t.name;
+        filterSel.appendChild(opt);
+      });
+      filterSel.addEventListener('change', renderLogQuestionsTable);
+    }
+    renderLogQuestionsTable();
+  }
+
+  function renderLogQuestionsTable(){
+    const wrap = $('#logQuestionsWrap');
+    const filterVal = $('#logTopicFilter').value;
+    const rows = [...questionLog].reverse().filter(e=> !filterVal || e.topic===filterVal);
+    if(rows.length===0){
+      wrap.innerHTML = `<div class="ledger-empty">No questions logged${filterVal?' for this topic':''} yet.</div>`;
+      return;
+    }
+    const trs = rows.map(e=>{
+      const ok = e.result==='Correct';
+      return `<tr>
+        <td>${e.date}</td>
+        <td>${e.topicName}</td>
+        <td style="max-width:340px;">${e.question}</td>
+        <td>${e.yourAnswer}</td>
+        <td><span class="score-tag ${ok?'good':'bad'}">${e.result}</span></td>
+      </tr>`;
+    }).join('');
+    wrap.innerHTML = `<table class="ledger-table">
+      <thead><tr><th>Date</th><th>Topic</th><th>Question</th><th>Your Answer</th><th>Result</th></tr></thead>
+      <tbody>${trs}</tbody>
+    </table>`;
   }
 
   /* =========================================================
